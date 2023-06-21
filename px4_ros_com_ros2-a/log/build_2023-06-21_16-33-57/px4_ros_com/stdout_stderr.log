@@ -1,0 +1,34 @@
+-- Using C++17 compiler
+-- Found ament_cmake: 0.9.12 (/opt/ros/foxy/share/ament_cmake/cmake)
+-- Using PYTHON_EXECUTABLE: /usr/bin/python3
+-- Override CMake install command with custom implementation using symlinks instead of copying resources
+-- Found builtin_interfaces: 1.0.0 (/opt/ros/foxy/share/builtin_interfaces/cmake)
+-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+-- Found rosidl_adapter: 1.3.1 (/opt/ros/foxy/share/rosidl_adapter/cmake)
+-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+-- Found rclcpp: 2.4.3 (/opt/ros/foxy/share/rclcpp/cmake)
+-- Found rmw_implementation_cmake: 1.0.4 (/opt/ros/foxy/share/rmw_implementation_cmake/cmake)
+-- Using RMW implementation 'rmw_fastrtps_cpp' as default
+-- Found rmw_fastrtps_cpp: 1.3.2 (/opt/ros/foxy/share/rmw_fastrtps_cpp/cmake)
+-- Found px4_msgs: 2.0.1 (/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/share/px4_msgs/cmake)
+-- Found sensor_msgs: 2.0.5 (/opt/ros/foxy/share/sensor_msgs/cmake)
+-- Found eigen3_cmake_module: 0.1.1 (/opt/ros/foxy/share/eigen3_cmake_module/cmake)
+-- fastrtpsgen found in /usr/local/bin
+-- fastrtpsgen version 1.0.4
+-- px4_msgs message dir under /home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/share/px4_msgs/msg
+-- IDL definitions under /home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/share/px4_msgs/msg
+-- Retrieving list of msgs to send...
+-- List of msgs to send: DebugArray, DebugKeyValue, DebugValue, DebugVect, OffboardControlMode, OnboardComputerStatus, OpticalFlow, PositionSetpoint, PositionSetpointTriplet, TelemetryStatus, Timesync, TrajectoryBezier, VehicleCommand, VehicleLocalPositionSetpoint, VehicleTrajectoryBezier, VehicleTrajectoryWaypoint, TrajectorySetpoint, VehicleMocapOdometry, VehicleVisualOdometry
+-- Retrieving list of msgs to receive...
+-- List of msgs to receive: CollisionConstraints, SensorCombined, Timesync, TimesyncStatus, TrajectoryWaypoint, VehicleControlMode, VehicleOdometry, VehicleStatus
+CMake Error at /opt/ros/foxy/share/ament_cmake_target_dependencies/cmake/ament_target_dependencies.cmake:77 (message):
+  ament_target_dependencies() the passed package name 'second_offboard' was
+  not found before
+Call Stack (most recent call first):
+  CMakeLists.txt:92 (ament_target_dependencies)
+
+
+-- Configuring incomplete, errors occurred!
+See also "/home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com/CMakeFiles/CMakeOutput.log".
+See also "/home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com/CMakeFiles/CMakeError.log".
+make: *** [Makefile:3099: cmake_check_build_system] Error 1

@@ -1,0 +1,195 @@
+[0.025s] Invoking command in '/home/kimseheon/px4_ros_com_ros2/build/px4_ros_com': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/opt/ros/foxy:/home/kimseheon/catkin_ws/devel:/opt/ros/noetic LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/catkin_ws/devel/lib:/opt/ros/noetic/lib PYTHONPATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib/python3.8/site-packages:/opt/ros/foxy/lib/python3.8/site-packages:/opt/ros/noetic/lib/python3/dist-packages _=/usr/bin/env /usr/local/bin/cmake /home/kimseheon/px4_ros_com_ros2/src/px4_ros_com -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com
+[0.034s] -- Using C++17 compiler
+[0.034s] -- Found ament_cmake: 0.9.12 (/opt/ros/foxy/share/ament_cmake/cmake)
+[0.058s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[0.246s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.252s] -- Found builtin_interfaces: 1.0.0 (/opt/ros/foxy/share/builtin_interfaces/cmake)
+[0.273s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.278s] -- Found rosidl_adapter: 1.3.1 (/opt/ros/foxy/share/rosidl_adapter/cmake)
+[0.403s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.441s] -- Found rclcpp: 2.4.3 (/opt/ros/foxy/share/rclcpp/cmake)
+[0.472s] -- Found rmw_implementation_cmake: 1.0.4 (/opt/ros/foxy/share/rmw_implementation_cmake/cmake)
+[0.473s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.596s] -- Found rmw_fastrtps_cpp: 1.3.2 (/opt/ros/foxy/share/rmw_fastrtps_cpp/cmake)
+[0.696s] -- Found px4_msgs: 2.0.1 (/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/share/px4_msgs/cmake)
+[0.709s] -- Found sensor_msgs: 2.0.5 (/opt/ros/foxy/share/sensor_msgs/cmake)
+[0.828s] -- Found eigen3_cmake_module: 0.1.1 (/opt/ros/foxy/share/eigen3_cmake_module/cmake)
+[0.829s] -- fastrtpsgen found in /usr/local/bin
+[0.950s] -- fastrtpsgen version 1.0.4
+[0.950s] -- px4_msgs message dir under /home/kimseheon/px4_ros_com_ros2/install/px4_msgs/share/px4_msgs/msg
+[0.950s] -- IDL definitions under /home/kimseheon/px4_ros_com_ros2/install/px4_msgs/share/px4_msgs/msg
+[0.950s] -- Retrieving list of msgs to send...
+[1.000s] -- List of msgs to send: DebugArray, DebugKeyValue, DebugValue, DebugVect, OffboardControlMode, OnboardComputerStatus, OpticalFlow, PositionSetpoint, PositionSetpointTriplet, TelemetryStatus, Timesync, TrajectoryBezier, VehicleCommand, VehicleLocalPositionSetpoint, VehicleTrajectoryBezier, VehicleTrajectoryWaypoint, TrajectorySetpoint, VehicleMocapOdometry, VehicleVisualOdometry
+[1.000s] -- Retrieving list of msgs to receive...
+[1.067s] -- List of msgs to receive: CollisionConstraints, SensorCombined, Timesync, TimesyncStatus, TrajectoryWaypoint, VehicleControlMode, VehicleOdometry, VehicleStatus
+[1.177s] -- Configuring done
+[1.270s] -- Generating done
+[1.271s] -- Build files have been written to: /home/kimseheon/px4_ros_com_ros2/build/px4_ros_com
+[1.279s] Invoked command in '/home/kimseheon/px4_ros_com_ros2/build/px4_ros_com' returned '0': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/opt/ros/foxy:/home/kimseheon/catkin_ws/devel:/opt/ros/noetic LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/catkin_ws/devel/lib:/opt/ros/noetic/lib PYTHONPATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib/python3.8/site-packages:/opt/ros/foxy/lib/python3.8/site-packages:/opt/ros/noetic/lib/python3/dist-packages _=/usr/bin/env /usr/local/bin/cmake /home/kimseheon/px4_ros_com_ros2/src/px4_ros_com -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com
+[1.282s] Invoking command in '/home/kimseheon/px4_ros_com_ros2/build/px4_ros_com': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/opt/ros/foxy:/home/kimseheon/catkin_ws/devel:/opt/ros/noetic LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/catkin_ws/devel/lib:/opt/ros/noetic/lib PYTHONPATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib/python3.8/site-packages:/opt/ros/foxy/lib/python3.8/site-packages:/opt/ros/noetic/lib/python3/dist-packages _=/usr/bin/env /usr/local/bin/cmake --build /home/kimseheon/px4_ros_com_ros2/build/px4_ros_com -- -j8 -l8
+[1.306s] [35m[1mScanning dependencies of target offboard_try2[0m
+[1.306s] [35m[1mScanning dependencies of target offboard_try1[0m
+[1.309s] [35m[1mScanning dependencies of target offboard_control[0m
+[1.309s] [35m[1mScanning dependencies of target vehicle_gps_position_listener[0m
+[1.309s] [35m[1mScanning dependencies of target debug_vect_advertiser[0m
+[1.309s] [35m[1mScanning dependencies of target sensor_combined_listener[0m
+[1.319s] [  2%] Built target frame_transforms
+[1.319s] [  3%] [32mBuilding CXX object CMakeFiles/debug_vect_advertiser.dir/src/examples/advertisers/debug_vect_advertiser.cpp.o[0m
+[1.319s] [  3%] [32mBuilding CXX object CMakeFiles/offboard_control.dir/src/examples/offboard/offboard_control.cpp.o[0m
+[1.319s] [  4%] [32mBuilding CXX object CMakeFiles/vehicle_gps_position_listener.dir/src/examples/listeners/vehicle_gps_position_listener.cpp.o[0m
+[1.320s] [  5%] [32mBuilding CXX object CMakeFiles/sensor_combined_listener.dir/src/examples/listeners/sensor_combined_listener.cpp.o[0m
+[1.326s] [35m[1mScanning dependencies of target offboard_try3[0m
+[1.337s] [  6%] [32mBuilding CXX object CMakeFiles/offboard_try2.dir/src/custom_offboard/offboard_try2.cpp.o[0m
+[1.337s] [  7%] [34m[1mGenerating micro-RTPS agent code...[0m
+[1.340s] [  8%] [32mBuilding CXX object CMakeFiles/offboard_try1.dir/src/custom_offboard/offboard_try1.cpp.o[0m
+[1.358s] [  9%] [32mBuilding CXX object CMakeFiles/offboard_try3.dir/src/custom_offboard/offboard_try3.cpp.o[0m
+[7.883s] [ 10%] [32m[1mLinking CXX executable debug_vect_advertiser[0m
+[8.154s] [ 10%] Built target debug_vect_advertiser
+[10.669s] [ 11%] [32m[1mLinking CXX executable vehicle_gps_position_listener[0m
+[10.677s] [35m[1mScanning dependencies of target micrortps_agent[0m
+[10.793s] [ 13%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/microRTPS_agent.cpp.o[0m
+[10.793s] [ 13%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/microRTPS_transport.cpp.o[0m
+[10.951s] [ 14%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/microRTPS_timesync.cpp.o[0m
+[11.052s] [ 14%] Built target vehicle_gps_position_listener
+[11.058s] [ 15%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/RtpsTopics.cpp.o[0m
+[11.452s] [ 16%] [32m[1mLinking CXX executable sensor_combined_listener[0m
+[11.865s] [ 16%] Built target sensor_combined_listener
+[11.871s] [ 17%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugArray.cpp.o[0m
+[12.612s] [ 18%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugArrayPubSubTypes.cpp.o[0m
+[12.671s] [ 19%] [32m[1mLinking CXX executable offboard_control[0m
+[13.086s] [ 20%] [32m[1mLinking CXX executable offboard_try1[0m
+[13.132s] [ 20%] Built target offboard_control
+[13.138s] [ 21%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugKeyValue.cpp.o[0m
+[13.441s] [ 22%] [32m[1mLinking CXX executable offboard_try3[0m
+[13.474s] [ 23%] [32m[1mLinking CXX executable offboard_try2[0m
+[13.554s] [ 23%] Built target offboard_try1
+[13.562s] [ 24%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugKeyValuePubSubTypes.cpp.o[0m
+[13.850s] [ 25%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugValue.cpp.o[0m
+[13.948s] [ 25%] Built target offboard_try3
+[13.953s] [ 26%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugValuePubSubTypes.cpp.o[0m
+[13.963s] [ 26%] Built target offboard_try2
+[13.969s] [ 27%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugVect.cpp.o[0m
+[14.564s] [ 28%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugVectPubSubTypes.cpp.o[0m
+[14.697s] [ 29%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OffboardControlMode.cpp.o[0m
+[15.423s] [ 30%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OffboardControlModePubSubTypes.cpp.o[0m
+[15.764s] [ 31%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OnboardComputerStatus.cpp.o[0m
+[16.540s] [ 32%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OnboardComputerStatusPubSubTypes.cpp.o[0m
+[16.552s] [ 33%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OpticalFlow.cpp.o[0m
+[16.591s] [ 34%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OpticalFlowPubSubTypes.cpp.o[0m
+[16.611s] [ 35%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/PositionSetpoint.cpp.o[0m
+[16.844s] [ 36%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/PositionSetpointPubSubTypes.cpp.o[0m
+[17.038s] [ 37%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/PositionSetpointTriplet.cpp.o[0m
+[17.256s] [ 37%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/PositionSetpointTripletPubSubTypes.cpp.o[0m
+[17.412s] [ 38%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TelemetryStatus.cpp.o[0m
+[17.696s] [ 39%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TelemetryStatusPubSubTypes.cpp.o[0m
+[17.740s] [ 40%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/Timesync.cpp.o[0m
+[18.227s] [ 41%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TimesyncPubSubTypes.cpp.o[0m
+[18.459s] [ 42%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectoryBezier.cpp.o[0m
+[18.484s] [ 43%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectoryBezierPubSubTypes.cpp.o[0m
+[19.185s] [ 44%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleCommand.cpp.o[0m
+[19.624s] [ 45%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleCommandPubSubTypes.cpp.o[0m
+[19.667s] [ 46%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleLocalPositionSetpoint.cpp.o[0m
+[19.954s] [ 47%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleLocalPositionSetpointPubSubTypes.cpp.o[0m
+[19.999s] [ 48%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryBezier.cpp.o[0m
+[20.323s] [ 49%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryBezierPubSubTypes.cpp.o[0m
+[20.426s] [ 50%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryWaypoint.cpp.o[0m
+[20.761s] [ 51%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryWaypointPubSubTypes.cpp.o[0m
+[20.862s] [ 52%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectorySetpoint.cpp.o[0m
+[21.120s] [ 53%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectorySetpointPubSubTypes.cpp.o[0m
+[21.314s] [ 54%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleMocapOdometry.cpp.o[0m
+[21.601s] [ 55%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleMocapOdometryPubSubTypes.cpp.o[0m
+[21.604s] [ 56%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleVisualOdometry.cpp.o[0m
+[22.042s] [ 57%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleVisualOdometryPubSubTypes.cpp.o[0m
+[22.399s] [ 58%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/CollisionConstraints.cpp.o[0m
+[22.669s] [ 59%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/CollisionConstraintsPubSubTypes.cpp.o[0m
+[23.035s] [ 60%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/SensorCombined.cpp.o[0m
+[23.128s] [ 61%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/SensorCombinedPubSubTypes.cpp.o[0m
+[23.412s] [ 62%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TimesyncStatus.cpp.o[0m
+[23.735s] [ 62%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TimesyncStatusPubSubTypes.cpp.o[0m
+[23.930s] [ 63%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectoryWaypoint.cpp.o[0m
+[24.128s] [ 64%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectoryWaypointPubSubTypes.cpp.o[0m
+[24.230s] [ 65%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleControlMode.cpp.o[0m
+[24.673s] [ 66%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleControlModePubSubTypes.cpp.o[0m
+[24.697s] [ 67%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleOdometry.cpp.o[0m
+[24.975s] [ 68%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleOdometryPubSubTypes.cpp.o[0m
+[25.137s] [ 69%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleStatus.cpp.o[0m
+[25.429s] [ 70%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleStatusPubSubTypes.cpp.o[0m
+[25.713s] [ 71%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryWaypointDesired.cpp.o[0m
+[25.899s] [ 72%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryWaypointDesiredPubSubTypes.cpp.o[0m
+[26.229s] [ 73%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/CollisionConstraints_Publisher.cpp.o[0m
+[26.455s] [ 74%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/SensorCombined_Publisher.cpp.o[0m
+[26.819s] [ 75%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/Timesync_Publisher.cpp.o[0m
+[27.208s] [ 76%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TimesyncStatus_Publisher.cpp.o[0m
+[27.801s] [ 77%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectoryWaypoint_Publisher.cpp.o[0m
+[28.071s] [ 78%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleControlMode_Publisher.cpp.o[0m
+[28.600s] [ 79%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleOdometry_Publisher.cpp.o[0m
+[28.993s] [ 80%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleStatus_Publisher.cpp.o[0m
+[29.697s] [ 81%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryWaypointDesired_Publisher.cpp.o[0m
+[29.872s] [ 82%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugArray_Subscriber.cpp.o[0m
+[30.225s] [ 83%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugKeyValue_Subscriber.cpp.o[0m
+[30.621s] [ 84%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugValue_Subscriber.cpp.o[0m
+[31.291s] [ 85%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugVect_Subscriber.cpp.o[0m
+[31.513s] [ 86%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OffboardControlMode_Subscriber.cpp.o[0m
+[32.064s] [ 87%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OnboardComputerStatus_Subscriber.cpp.o[0m
+[32.429s] [ 87%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OpticalFlow_Subscriber.cpp.o[0m
+[33.162s] [ 88%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/PositionSetpoint_Subscriber.cpp.o[0m
+[33.611s] [ 89%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/PositionSetpointTriplet_Subscriber.cpp.o[0m
+[33.990s] [ 90%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TelemetryStatus_Subscriber.cpp.o[0m
+[34.372s] [ 91%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/Timesync_Subscriber.cpp.o[0m
+[35.101s] [ 92%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectoryBezier_Subscriber.cpp.o[0m
+[35.371s] [ 93%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleCommand_Subscriber.cpp.o[0m
+[35.811s] [ 94%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleLocalPositionSetpoint_Subscriber.cpp.o[0m
+[36.186s] [ 95%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryBezier_Subscriber.cpp.o[0m
+[36.954s] [ 96%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryWaypoint_Subscriber.cpp.o[0m
+[37.362s] [ 97%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectorySetpoint_Subscriber.cpp.o[0m
+[37.754s] [ 98%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleMocapOdometry_Subscriber.cpp.o[0m
+[38.122s] [ 99%] [32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleVisualOdometry_Subscriber.cpp.o[0m
+[41.095s] [100%] [32m[1mLinking CXX executable micrortps_agent[0m
+[43.236s] [100%] Built target micrortps_agent
+[43.243s] Invoked command in '/home/kimseheon/px4_ros_com_ros2/build/px4_ros_com' returned '0': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/opt/ros/foxy:/home/kimseheon/catkin_ws/devel:/opt/ros/noetic LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/catkin_ws/devel/lib:/opt/ros/noetic/lib PYTHONPATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib/python3.8/site-packages:/opt/ros/foxy/lib/python3.8/site-packages:/opt/ros/noetic/lib/python3/dist-packages _=/usr/bin/env /usr/local/bin/cmake --build /home/kimseheon/px4_ros_com_ros2/build/px4_ros_com -- -j8 -l8
+[43.608s] Invoking command in '/home/kimseheon/px4_ros_com_ros2/build/px4_ros_com': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/opt/ros/foxy:/home/kimseheon/catkin_ws/devel:/opt/ros/noetic LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/catkin_ws/devel/lib:/opt/ros/noetic/lib PYTHONPATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib/python3.8/site-packages:/opt/ros/foxy/lib/python3.8/site-packages:/opt/ros/noetic/lib/python3/dist-packages _=/usr/bin/env /usr/local/bin/cmake --install /home/kimseheon/px4_ros_com_ros2/build/px4_ros_com
+[43.612s] -- Install configuration: ""
+[43.613s] -- Execute custom install script
+[43.614s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib/px4_ros_com/sensor_combined_listener
+[43.619s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib/px4_ros_com/vehicle_gps_position_listener
+[43.626s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib/px4_ros_com/debug_vect_advertiser
+[43.631s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib/px4_ros_com/offboard_control
+[43.637s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib/px4_ros_com/offboard_try1
+[43.642s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib/px4_ros_com/offboard_try2
+[43.647s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib/px4_ros_com/offboard_try3
+[43.651s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/environment/library_path.sh
+[43.656s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/environment/library_path.dsv
+[43.661s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/include/px4_ros_com/frame_transforms.h
+[43.666s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/cmake/EnableC++XX.cmake
+[43.670s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/cmake/EnableSanitizers.cmake
+[43.674s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/cmake/GenerateMicroRTPSAgent.cmake
+[43.679s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/launch/sensor_combined_listener.launch.py
+[43.684s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/test/__init__.py
+[43.689s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/test/pipeline_io_test.py
+[43.693s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/test/test_input.py
+[43.697s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/test/test_output.py
+[43.702s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/ament_index/resource_index/package_run_dependencies/px4_ros_com
+[43.706s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/ament_index/resource_index/parent_prefix_path/px4_ros_com
+[43.711s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/environment/ament_prefix_path.sh
+[43.715s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/environment/ament_prefix_path.dsv
+[43.719s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/environment/path.sh
+[43.723s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/environment/path.dsv
+[43.727s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/local_setup.bash
+[43.732s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/local_setup.sh
+[43.736s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/local_setup.zsh
+[43.740s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/local_setup.dsv
+[43.744s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/package.dsv
+[43.748s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/ament_index/resource_index/packages/px4_ros_com
+[43.752s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/cmake/ament_cmake_export_dependencies-extras.cmake
+[43.756s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/cmake/ament_cmake_export_targets-extras.cmake
+[43.759s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/cmake/ament_cmake_export_include_directories-extras.cmake
+[43.763s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/cmake/ament_cmake_export_libraries-extras.cmake
+[43.766s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/cmake/px4_ros_comConfig.cmake
+[43.770s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/cmake/px4_ros_comConfig-version.cmake
+[43.773s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/package.xml
+[43.776s] -- Up-to-date: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib/libframe_transforms.so
+[43.776s] -- Installing: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/bin/micrortps_agent
+[43.827s] -- Set runtime path of "/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/bin/micrortps_agent" to ""
+[43.827s] -- Up-to-date: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/cmake/export_frame_transformsExport.cmake
+[43.827s] -- Installing: /home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/share/px4_ros_com/cmake/export_frame_transformsExport-noconfig.cmake
+[43.831s] Invoked command in '/home/kimseheon/px4_ros_com_ros2/build/px4_ros_com' returned '0': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/opt/ros/foxy:/home/kimseheon/catkin_ws/devel:/opt/ros/noetic LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/catkin_ws/devel/lib:/opt/ros/noetic/lib PYTHONPATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib/python3.8/site-packages:/opt/ros/foxy/lib/python3.8/site-packages:/opt/ros/noetic/lib/python3/dist-packages _=/usr/bin/env /usr/local/bin/cmake --install /home/kimseheon/px4_ros_com_ros2/build/px4_ros_com

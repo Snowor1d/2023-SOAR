@@ -1,0 +1,62 @@
+[0.016s] Invoking command in '/home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/opt/ros/foxy LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/lib:/home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib _=/usr/bin/env /usr/local/bin/cmake --build /home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com -- -j8 -l8
+[0.044s] -- Using C++17 compiler
+[0.045s] -- Found ament_cmake: 0.9.12 (/opt/ros/foxy/share/ament_cmake/cmake)
+[0.080s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[0.259s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.266s] -- Found builtin_interfaces: 1.0.0 (/opt/ros/foxy/share/builtin_interfaces/cmake)
+[0.288s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.293s] -- Found rosidl_adapter: 1.3.1 (/opt/ros/foxy/share/rosidl_adapter/cmake)
+[0.417s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.457s] -- Found rclcpp: 2.4.3 (/opt/ros/foxy/share/rclcpp/cmake)
+[0.488s] -- Found rmw_implementation_cmake: 1.0.4 (/opt/ros/foxy/share/rmw_implementation_cmake/cmake)
+[0.490s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.619s] -- Found rmw_fastrtps_cpp: 1.3.2 (/opt/ros/foxy/share/rmw_fastrtps_cpp/cmake)
+[0.722s] -- Found px4_msgs: 2.0.1 (/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/share/px4_msgs/cmake)
+[0.747s] -- Found sensor_msgs: 2.0.5 (/opt/ros/foxy/share/sensor_msgs/cmake)
+[0.873s] -- Found eigen3_cmake_module: 0.1.1 (/opt/ros/foxy/share/eigen3_cmake_module/cmake)
+[0.874s] -- fastrtpsgen found in /usr/local/bin
+[0.977s] -- fastrtpsgen version 1.0.4
+[0.977s] -- px4_msgs message dir under /home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/share/px4_msgs/msg
+[0.977s] -- IDL definitions under /home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/share/px4_msgs/msg
+[0.977s] -- Retrieving list of msgs to send...
+[1.042s] -- List of msgs to send: DebugArray, DebugKeyValue, DebugValue, DebugVect, OffboardControlMode, OnboardComputerStatus, OpticalFlow, PositionSetpoint, PositionSetpointTriplet, TelemetryStatus, Timesync, TrajectoryBezier, VehicleCommand, VehicleLocalPositionSetpoint, VehicleTrajectoryBezier, VehicleTrajectoryWaypoint, TrajectorySetpoint, VehicleMocapOdometry, VehicleVisualOdometry
+[1.042s] -- Retrieving list of msgs to receive...
+[1.092s] -- List of msgs to receive: CollisionConstraints, SensorCombined, Timesync, TimesyncStatus, TrajectoryWaypoint, VehicleControlMode, VehicleOdometry, VehicleStatus
+[1.194s] -- Configuring done
+[1.199s] CMake Error at CMakeLists.txt:71 (add_executable):
+[1.199s]   Cannot find source file:
+[1.199s] 
+[1.199s]     src/custom_offboard/third_offboard.cpp
+[1.199s] 
+[1.199s]   Tried extensions .c .C .c++ .cc .cpp .cxx .cu .m .M .mm .h .hh .h++ .hm
+[1.199s]   .hpp .hxx .in .txx
+[1.199s] Call Stack (most recent call first):
+[1.200s]   CMakeLists.txt:101 (custom_executable)
+[1.200s] 
+[1.200s] 
+[1.201s] CMake Error at CMakeLists.txt:71 (add_executable):
+[1.202s]   Cannot find source file:
+[1.202s] 
+[1.202s]     src/custom_offboard/second_offboard.cpp
+[1.202s] 
+[1.202s]   Tried extensions .c .C .c++ .cc .cpp .cxx .cu .m .M .mm .h .hh .h++ .hm
+[1.202s]   .hpp .hxx .in .txx
+[1.202s] Call Stack (most recent call first):
+[1.202s]   CMakeLists.txt:100 (custom_executable)
+[1.202s] 
+[1.202s] 
+[1.203s] CMake Error at CMakeLists.txt:71 (add_executable):
+[1.204s]   No SOURCES given to target: third_offboard
+[1.204s] Call Stack (most recent call first):
+[1.204s]   CMakeLists.txt:101 (custom_executable)
+[1.204s] 
+[1.204s] 
+[1.204s] CMake Error at CMakeLists.txt:71 (add_executable):
+[1.204s]   No SOURCES given to target: second_offboard
+[1.205s] Call Stack (most recent call first):
+[1.205s]   CMakeLists.txt:100 (custom_executable)
+[1.205s] 
+[1.205s] 
+[1.205s] CMake Generate step failed.  Build files cannot be regenerated correctly.
+[1.214s] make: *** [Makefile:3099: cmake_check_build_system] Error 1
+[1.216s] Invoked command in '/home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com' returned '2': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/opt/ros/foxy LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/lib:/home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib _=/usr/bin/env /usr/local/bin/cmake --build /home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com -- -j8 -l8

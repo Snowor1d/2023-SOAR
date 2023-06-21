@@ -1,0 +1,32 @@
+[0.025s] Invoking command in '/home/kimseheon/px4_ros_com_ros2/build/px4_ros_com': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/opt/ros/foxy:/home/kimseheon/catkin_ws/devel:/opt/ros/noetic LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/catkin_ws/devel/lib:/opt/ros/noetic/lib PYTHONPATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib/python3.8/site-packages:/opt/ros/foxy/lib/python3.8/site-packages:/opt/ros/noetic/lib/python3/dist-packages _=/usr/bin/env /usr/local/bin/cmake /home/kimseheon/px4_ros_com_ros2/src/px4_ros_com -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com
+[0.034s] -- Using C++17 compiler
+[0.035s] -- Found ament_cmake: 0.9.12 (/opt/ros/foxy/share/ament_cmake/cmake)
+[0.065s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[0.247s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.253s] -- Found builtin_interfaces: 1.0.0 (/opt/ros/foxy/share/builtin_interfaces/cmake)
+[0.274s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.279s] -- Found rosidl_adapter: 1.3.1 (/opt/ros/foxy/share/rosidl_adapter/cmake)
+[0.405s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.444s] -- Found rclcpp: 2.4.3 (/opt/ros/foxy/share/rclcpp/cmake)
+[0.476s] -- Found rmw_implementation_cmake: 1.0.4 (/opt/ros/foxy/share/rmw_implementation_cmake/cmake)
+[0.477s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.601s] -- Found rmw_fastrtps_cpp: 1.3.2 (/opt/ros/foxy/share/rmw_fastrtps_cpp/cmake)
+[0.702s] -- Found px4_msgs: 2.0.1 (/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/share/px4_msgs/cmake)
+[0.716s] -- Found sensor_msgs: 2.0.5 (/opt/ros/foxy/share/sensor_msgs/cmake)
+[0.836s] -- Found eigen3_cmake_module: 0.1.1 (/opt/ros/foxy/share/eigen3_cmake_module/cmake)
+[0.837s] -- fastrtpsgen found in /usr/local/bin
+[0.946s] -- fastrtpsgen version 1.0.4
+[0.946s] -- px4_msgs message dir under /home/kimseheon/px4_ros_com_ros2/install/px4_msgs/share/px4_msgs/msg
+[0.946s] -- IDL definitions under /home/kimseheon/px4_ros_com_ros2/install/px4_msgs/share/px4_msgs/msg
+[0.946s] -- Retrieving list of msgs to send...
+[0.995s] -- List of msgs to send: DebugArray, DebugKeyValue, DebugValue, DebugVect, OffboardControlMode, OnboardComputerStatus, OpticalFlow, PositionSetpoint, PositionSetpointTriplet, TelemetryStatus, Timesync, TrajectoryBezier, VehicleCommand, VehicleLocalPositionSetpoint, VehicleTrajectoryBezier, VehicleTrajectoryWaypoint, TrajectorySetpoint, VehicleMocapOdometry, VehicleVisualOdometry
+[0.995s] -- Retrieving list of msgs to receive...
+[1.062s] -- List of msgs to receive: CollisionConstraints, SensorCombined, Timesync, TimesyncStatus, TrajectoryWaypoint, VehicleControlMode, VehicleOdometry, VehicleStatus
+[1.080s] CMake Error at CMakeLists.txt:100 (custom_executables):
+[1.080s]   Unknown CMake command "custom_executables".
+[1.080s] 
+[1.080s] 
+[1.080s] -- Configuring incomplete, errors occurred!
+[1.080s] See also "/home/kimseheon/px4_ros_com_ros2/build/px4_ros_com/CMakeFiles/CMakeOutput.log".
+[1.080s] See also "/home/kimseheon/px4_ros_com_ros2/build/px4_ros_com/CMakeFiles/CMakeError.log".
+[1.089s] Invoked command in '/home/kimseheon/px4_ros_com_ros2/build/px4_ros_com' returned '1': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/opt/ros/foxy:/home/kimseheon/catkin_ws/devel:/opt/ros/noetic LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/catkin_ws/devel/lib:/opt/ros/noetic/lib PYTHONPATH=/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib/python3.8/site-packages:/opt/ros/foxy/lib/python3.8/site-packages:/opt/ros/noetic/lib/python3/dist-packages _=/usr/bin/env /usr/local/bin/cmake /home/kimseheon/px4_ros_com_ros2/src/px4_ros_com -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com

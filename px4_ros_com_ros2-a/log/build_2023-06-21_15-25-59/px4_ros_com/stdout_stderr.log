@@ -1,0 +1,9 @@
+[  2%] Built target second_offboard
+[  6%] Built target vehicle_gps_position_listener
+[  6%] Built target offboard_control
+[  8%] Built target sensor_combined_listener
+[ 10%] Built target debug_vect_advertiser
+[ 12%] Built target frame_transforms
+make[2]: *** No rule to make target '/opt/ros/foxy/lib/libfastrtps.so.2.1.3', needed by 'micrortps_agent'.  Stop.
+make[1]: *** [CMakeFiles/Makefile2:163: CMakeFiles/micrortps_agent.dir/all] Error 2
+make: *** [Makefile:160: all] Error 2

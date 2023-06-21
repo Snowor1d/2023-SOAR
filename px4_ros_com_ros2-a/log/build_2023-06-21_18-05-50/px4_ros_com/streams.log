@@ -1,0 +1,90 @@
+[0.015s] Invoking command in '/home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/opt/ros/foxy LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/lib:/home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib _=/usr/bin/env /usr/local/bin/cmake --build /home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com -- -j8 -l8
+[0.030s] -- Using C++17 compiler
+[0.030s] -- Found ament_cmake: 0.9.12 (/opt/ros/foxy/share/ament_cmake/cmake)
+[0.049s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[0.171s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.176s] -- Found builtin_interfaces: 1.0.0 (/opt/ros/foxy/share/builtin_interfaces/cmake)
+[0.192s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.194s] -- Found rosidl_adapter: 1.3.1 (/opt/ros/foxy/share/rosidl_adapter/cmake)
+[0.288s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.319s] -- Found rclcpp: 2.4.3 (/opt/ros/foxy/share/rclcpp/cmake)
+[0.346s] -- Found rmw_implementation_cmake: 1.0.4 (/opt/ros/foxy/share/rmw_implementation_cmake/cmake)
+[0.347s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.452s] -- Found rmw_fastrtps_cpp: 1.3.2 (/opt/ros/foxy/share/rmw_fastrtps_cpp/cmake)
+[0.535s] -- Found px4_msgs: 2.0.1 (/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/share/px4_msgs/cmake)
+[0.547s] -- Found sensor_msgs: 2.0.5 (/opt/ros/foxy/share/sensor_msgs/cmake)
+[0.646s] -- Found eigen3_cmake_module: 0.1.1 (/opt/ros/foxy/share/eigen3_cmake_module/cmake)
+[0.646s] -- fastrtpsgen found in /usr/local/bin
+[0.722s] -- fastrtpsgen version 1.0.4
+[0.722s] -- px4_msgs message dir under /home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/share/px4_msgs/msg
+[0.722s] -- IDL definitions under /home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/share/px4_msgs/msg
+[0.722s] -- Retrieving list of msgs to send...
+[0.762s] -- List of msgs to send: DebugArray, DebugKeyValue, DebugValue, DebugVect, OffboardControlMode, OnboardComputerStatus, OpticalFlow, PositionSetpoint, PositionSetpointTriplet, TelemetryStatus, Timesync, TrajectoryBezier, VehicleCommand, VehicleLocalPositionSetpoint, VehicleTrajectoryBezier, VehicleTrajectoryWaypoint, TrajectorySetpoint, VehicleMocapOdometry, VehicleVisualOdometry
+[0.762s] -- Retrieving list of msgs to receive...
+[0.802s] -- List of msgs to receive: CollisionConstraints, SensorCombined, Timesync, TimesyncStatus, TrajectoryWaypoint, VehicleControlMode, VehicleOdometry, VehicleStatus
+[0.866s] -- Configuring done
+[0.928s] -- Generating done
+[0.930s] -- Build files have been written to: /home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com
+[0.951s] [  2%] Built target offboard_control
+[0.952s] [  4%] Built target sensor_combined_listener
+[0.952s] [  6%] Built target third_offboard
+[0.952s] [  8%] Built target second_offboard
+[0.952s] [ 10%] Built target vehicle_gps_position_listener
+[0.953s] [ 12%] Built target frame_transforms
+[0.953s] [ 13%] Built target debug_vect_advertiser
+[0.957s] [35m[1mScanning dependencies of target fourth_offboard[0m
+[0.957s] [35m[1mScanning dependencies of target first_offboard[0m
+[0.972s] [ 15%] [32mBuilding CXX object CMakeFiles/first_offboard.dir/src/custom_offboard/first_offboard.cpp.o[0m
+[0.972s] [ 15%] [32mBuilding CXX object CMakeFiles/fourth_offboard.dir/src/custom_offboard/fourth_offboard.cpp.o[0m
+[0.987s] [ 98%] Built target micrortps_agent
+[6.858s] [ 99%] [32m[1mLinking CXX executable fourth_offboard[0m
+[6.862s] [100%] [32m[1mLinking CXX executable first_offboard[0m
+[7.122s] [100%] Built target first_offboard
+[7.128s] [100%] Built target fourth_offboard
+[7.132s] Invoked command in '/home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com' returned '0': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/opt/ros/foxy LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/lib:/home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib _=/usr/bin/env /usr/local/bin/cmake --build /home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com -- -j8 -l8
+[7.371s] Invoking command in '/home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/opt/ros/foxy LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/lib:/home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib _=/usr/bin/env /usr/local/bin/cmake --install /home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com
+[7.375s] -- Install configuration: ""
+[7.375s] -- Execute custom install script
+[7.376s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib/px4_ros_com/sensor_combined_listener
+[7.376s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib/px4_ros_com/vehicle_gps_position_listener
+[7.376s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib/px4_ros_com/debug_vect_advertiser
+[7.376s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib/px4_ros_com/offboard_control
+[7.377s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib/px4_ros_com/first_offboard
+[7.379s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib/px4_ros_com/second_offboard
+[7.379s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib/px4_ros_com/third_offboard
+[7.380s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib/px4_ros_com/fourth_offboard
+[7.383s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/environment/library_path.sh
+[7.383s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/environment/library_path.dsv
+[7.383s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/include/px4_ros_com/frame_transforms.h
+[7.384s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/cmake/EnableC++XX.cmake
+[7.384s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/cmake/EnableSanitizers.cmake
+[7.384s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/cmake/GenerateMicroRTPSAgent.cmake
+[7.384s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/launch/sensor_combined_listener.launch.py
+[7.384s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/test/__init__.py
+[7.385s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/test/pipeline_io_test.py
+[7.385s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/test/test_input.py
+[7.385s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/test/test_output.py
+[7.385s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/ament_index/resource_index/package_run_dependencies/px4_ros_com
+[7.385s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/ament_index/resource_index/parent_prefix_path/px4_ros_com
+[7.385s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/environment/ament_prefix_path.sh
+[7.385s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/environment/ament_prefix_path.dsv
+[7.386s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/environment/path.sh
+[7.386s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/environment/path.dsv
+[7.386s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/local_setup.bash
+[7.386s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/local_setup.sh
+[7.386s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/local_setup.zsh
+[7.386s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/local_setup.dsv
+[7.387s] -- Symlinking: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/package.dsv
+[7.389s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/ament_index/resource_index/packages/px4_ros_com
+[7.389s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/cmake/ament_cmake_export_dependencies-extras.cmake
+[7.390s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/cmake/ament_cmake_export_targets-extras.cmake
+[7.390s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/cmake/ament_cmake_export_include_directories-extras.cmake
+[7.390s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/cmake/ament_cmake_export_libraries-extras.cmake
+[7.390s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/cmake/px4_ros_comConfig.cmake
+[7.390s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/cmake/px4_ros_comConfig-version.cmake
+[7.390s] -- Up-to-date symlink: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/package.xml
+[7.391s] -- Up-to-date: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib/libframe_transforms.so
+[7.391s] -- Up-to-date: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/bin/micrortps_agent
+[7.391s] -- Up-to-date: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/cmake/export_frame_transformsExport.cmake
+[7.391s] -- Installing: /home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/share/px4_ros_com/cmake/export_frame_transformsExport-noconfig.cmake
+[7.396s] Invoked command in '/home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com' returned '0': CMAKE_PREFIX_PATH=/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/opt/ros/foxy LD_LIBRARY_PATH=/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/lib:/home/kimseheon/px4_ros_com_ros2-a/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib _=/usr/bin/env /usr/local/bin/cmake --install /home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com

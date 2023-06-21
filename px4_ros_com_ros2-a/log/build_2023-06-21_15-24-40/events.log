@@ -1,0 +1,390 @@
+[0.000000] (-) TimerEvent: {}
+[0.000106] (-) JobUnselected: {'identifier': 'px4_msgs'}
+[0.000126] (px4_ros_com) JobQueued: {'identifier': 'px4_ros_com', 'dependencies': OrderedDict([('px4_msgs', '/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs')])}
+[0.000271] (px4_ros_com) JobStarted: {'identifier': 'px4_ros_com'}
+[0.020762] (px4_ros_com) JobProgress: {'identifier': 'px4_ros_com', 'progress': 'cmake'}
+[0.021646] (px4_ros_com) JobProgress: {'identifier': 'px4_ros_com', 'progress': 'build'}
+[0.022188] (px4_ros_com) Command: {'cmd': ['/usr/local/bin/cmake', '--build', '/home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com', '--', '-j8', '-l8'], 'cwd': '/home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com', 'env': OrderedDict([('SHELL', '/bin/bash'), ('ROS_VERSION', '2'), ('SESSION_MANAGER', 'local/kimseheon-Swift-SF314-511:@/tmp/.ICE-unix/1539,unix/kimseheon-Swift-SF314-511:/tmp/.ICE-unix/1539'), ('QT_ACCESSIBILITY', '1'), ('COLORTERM', 'truecolor'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_MENU_PREFIX', 'gnome-'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('GTK_IM_MODULE', 'fcitx'), ('ROS_PYTHON_VERSION', '3'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('QT4_IM_MODULE', 'fcitx'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('GRADLE_HOME', '/home/kimseheon/.sdkman/candidates/gradle/current'), ('TERMINATOR_UUID', 'urn:uuid:d7706811-2e93-4196-8f60-63e4de4a9d18'), ('SDKMAN_CANDIDATES_DIR', '/home/kimseheon/.sdkman/candidates'), ('XMODIFIERS', '@im=fcitx'), ('DESKTOP_SESSION', 'ubuntu'), ('SSH_AGENT_PID', '1477'), ('GTK_MODULES', 'gail:atk-bridge'), ('PWD', '/home/kimseheon/px4_ros_com_ros2-a/build/px4_ros_com'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('LOGNAME', 'kimseheon'), ('XDG_SESSION_TYPE', 'x11'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('WINDOWPATH', '2'), ('HOME', '/home/kimseheon'), ('USERNAME', 'kimseheon'), ('IM_CONFIG_PHASE', '1'), ('LANG', 'en_US.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('VTE_VERSION', '6003'), ('AMENT_PREFIX_PATH', '/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2-c/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2-c/install/px4_msgs:/opt/ros/foxy'), ('CMAKE_PREFIX_PATH', '/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs:/home/kimseheon/px4_ros_com_ros2-c/install/px4_ros_com:/home/kimseheon/px4_ros_com_ros2-c/install/px4_msgs:/opt/ros/foxy'), ('COLCON_PREFIX_PATH', '/home/kimseheon/px4_ros_com_ros2/install:/home/kimseheon/px4_ros_com_ros2-c/install'), ('INVOCATION_ID', 'b6a7858c2666497795797c9842984300'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator21a9d5db22c73a993ff0b42f64b396873'), ('MANAGERPID', '1113'), ('CLUTTER_IM_MODULE', 'fcitx'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('XDG_SESSION_CLASS', 'user'), ('PYTHONPATH', '/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/lib/python3.8/site-packages:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib/python3.8/site-packages:/home/kimseheon/px4_ros_com_ros2-c/install/px4_msgs/lib/python3.8/site-packages:/opt/ros/foxy/lib/python3.8/site-packages'), ('COLCON', '1'), ('TERM', 'xterm-256color'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'kimseheon'), ('SDKMAN_DIR', '/home/kimseheon/.sdkman'), ('DISPLAY', ':0'), ('SHLVL', '1'), ('QT_IM_MODULE', 'fcitx'), ('SDKMAN_CANDIDATES_API', 'https://api.sdkman.io/2'), ('LD_LIBRARY_PATH', '/home/kimseheon/px4_ros_com_ros2-a/install/px4_msgs/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2/install/px4_msgs/lib:/home/kimseheon/px4_ros_com_ros2-c/install/px4_ros_com/lib:/home/kimseheon/px4_ros_com_ros2-c/install/px4_msgs/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/x86_64-linux-gnu:/opt/ros/foxy/lib'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('ROS_LOCALHOST_ONLY', '0'), ('JOURNAL_STREAM', '8:43209'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PATH', '/home/kimseheon/.sdkman/candidates/gradle/current/bin:/home/kimseheon/px4_ros_com_ros2/install/px4_ros_com/bin:/home/kimseheon/px4_ros_com_ros2-c/install/px4_ros_com/bin:/opt/ros/foxy/bin:/opt/gcc-arm-none-eabi-9-2020-q2-update/bin:/home/kimseheon/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('GDMSESSION', 'ubuntu'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('SDKMAN_PLATFORM', 'linuxx64'), ('ROS_DISTRO', 'foxy'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '4823'), ('OLDPWD', '/home/kimseheon'), ('_', '/usr/bin/env')]), 'shell': False}
+[0.070628] (px4_ros_com) StdoutLine: {'line': b'\x1b[35m\x1b[1mScanning dependencies of target second_offboard\x1b[0m\n'}
+[0.075748] (px4_ros_com) StdoutLine: {'line': b'[  2%] Built target frame_transforms\n'}
+[0.076912] (px4_ros_com) StdoutLine: {'line': b'[  4%] Built target vehicle_gps_position_listener\n'}
+[0.077138] (px4_ros_com) StdoutLine: {'line': b'[  8%] Built target sensor_combined_listener\n'}
+[0.077202] (px4_ros_com) StdoutLine: {'line': b'[  8%] Built target offboard_control\n'}
+[0.077271] (px4_ros_com) StdoutLine: {'line': b'[ 10%] Built target debug_vect_advertiser\n'}
+[0.079961] (px4_ros_com) StdoutLine: {'line': b'[ 11%] \x1b[34m\x1b[1mGenerating micro-RTPS agent code...\x1b[0m\n'}
+[0.082125] (px4_ros_com) StdoutLine: {'line': b'[ 12%] \x1b[32mBuilding CXX object CMakeFiles/second_offboard.dir/src/examples/second_offboard/second_offboard.cpp.o\x1b[0m\n'}
+[0.099461] (-) TimerEvent: {}
+[0.199703] (-) TimerEvent: {}
+[0.300043] (-) TimerEvent: {}
+[0.400373] (-) TimerEvent: {}
+[0.500699] (-) TimerEvent: {}
+[0.601019] (-) TimerEvent: {}
+[0.701250] (-) TimerEvent: {}
+[0.801513] (-) TimerEvent: {}
+[0.901819] (-) TimerEvent: {}
+[1.002151] (-) TimerEvent: {}
+[1.102449] (-) TimerEvent: {}
+[1.202819] (-) TimerEvent: {}
+[1.303110] (-) TimerEvent: {}
+[1.403376] (-) TimerEvent: {}
+[1.503700] (-) TimerEvent: {}
+[1.604031] (-) TimerEvent: {}
+[1.704311] (-) TimerEvent: {}
+[1.804664] (-) TimerEvent: {}
+[1.905012] (-) TimerEvent: {}
+[2.005350] (-) TimerEvent: {}
+[2.105682] (-) TimerEvent: {}
+[2.205997] (-) TimerEvent: {}
+[2.306320] (-) TimerEvent: {}
+[2.406643] (-) TimerEvent: {}
+[2.506965] (-) TimerEvent: {}
+[2.607361] (-) TimerEvent: {}
+[2.707619] (-) TimerEvent: {}
+[2.807914] (-) TimerEvent: {}
+[2.908348] (-) TimerEvent: {}
+[3.008695] (-) TimerEvent: {}
+[3.108977] (-) TimerEvent: {}
+[3.209242] (-) TimerEvent: {}
+[3.249189] (px4_ros_com) StdoutLine: {'line': b'\x1b[35m\x1b[1mScanning dependencies of target micrortps_agent\x1b[0m\n'}
+[3.299181] (px4_ros_com) StdoutLine: {'line': b'[ 14%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/microRTPS_transport.cpp.o\x1b[0m\n'}
+[3.299423] (px4_ros_com) StdoutLine: {'line': b'[ 15%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/microRTPS_timesync.cpp.o\x1b[0m\n'}
+[3.299504] (px4_ros_com) StdoutLine: {'line': b'[ 14%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/microRTPS_agent.cpp.o\x1b[0m\n'}
+[3.299627] (px4_ros_com) StdoutLine: {'line': b'[ 16%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/RtpsTopics.cpp.o\x1b[0m\n'}
+[3.299746] (px4_ros_com) StdoutLine: {'line': b'[ 17%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugArray.cpp.o\x1b[0m\n'}
+[3.300077] (px4_ros_com) StdoutLine: {'line': b'[ 18%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugKeyValue.cpp.o\x1b[0m\n'}
+[3.300844] (px4_ros_com) StdoutLine: {'line': b'[ 19%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugArrayPubSubTypes.cpp.o\x1b[0m\n'}
+[3.309353] (-) TimerEvent: {}
+[3.409674] (-) TimerEvent: {}
+[3.439717] (px4_ros_com) StdoutLine: {'line': b'[ 20%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugKeyValuePubSubTypes.cpp.o\x1b[0m\n'}
+[3.509783] (-) TimerEvent: {}
+[3.610112] (-) TimerEvent: {}
+[3.710440] (-) TimerEvent: {}
+[3.810775] (-) TimerEvent: {}
+[3.859033] (px4_ros_com) StdoutLine: {'line': b'[ 21%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugValue.cpp.o\x1b[0m\n'}
+[3.876161] (px4_ros_com) StdoutLine: {'line': b'[ 22%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugValuePubSubTypes.cpp.o\x1b[0m\n'}
+[3.910897] (-) TimerEvent: {}
+[4.011249] (-) TimerEvent: {}
+[4.111605] (-) TimerEvent: {}
+[4.211957] (-) TimerEvent: {}
+[4.312317] (-) TimerEvent: {}
+[4.412645] (-) TimerEvent: {}
+[4.424912] (px4_ros_com) StdoutLine: {'line': b'[ 23%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugVect.cpp.o\x1b[0m\n'}
+[4.512774] (-) TimerEvent: {}
+[4.613113] (-) TimerEvent: {}
+[4.713459] (-) TimerEvent: {}
+[4.813791] (-) TimerEvent: {}
+[4.914110] (-) TimerEvent: {}
+[4.994243] (px4_ros_com) StdoutLine: {'line': b'[ 24%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugVectPubSubTypes.cpp.o\x1b[0m\n'}
+[5.014225] (-) TimerEvent: {}
+[5.114581] (-) TimerEvent: {}
+[5.214935] (-) TimerEvent: {}
+[5.315290] (-) TimerEvent: {}
+[5.415646] (-) TimerEvent: {}
+[5.516005] (-) TimerEvent: {}
+[5.616363] (-) TimerEvent: {}
+[5.716717] (-) TimerEvent: {}
+[5.751262] (px4_ros_com) StdoutLine: {'line': b'[ 25%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OffboardControlMode.cpp.o\x1b[0m\n'}
+[5.816839] (-) TimerEvent: {}
+[5.911255] (px4_ros_com) StdoutLine: {'line': b'[ 26%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OffboardControlModePubSubTypes.cpp.o\x1b[0m\n'}
+[5.916962] (-) TimerEvent: {}
+[6.017302] (-) TimerEvent: {}
+[6.117641] (-) TimerEvent: {}
+[6.217986] (-) TimerEvent: {}
+[6.316639] (px4_ros_com) StdoutLine: {'line': b'[ 27%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OnboardComputerStatus.cpp.o\x1b[0m\n'}
+[6.318083] (-) TimerEvent: {}
+[6.320032] (px4_ros_com) StdoutLine: {'line': b'[ 28%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OnboardComputerStatusPubSubTypes.cpp.o\x1b[0m\n'}
+[6.418201] (-) TimerEvent: {}
+[6.518527] (-) TimerEvent: {}
+[6.618840] (-) TimerEvent: {}
+[6.719183] (-) TimerEvent: {}
+[6.819532] (-) TimerEvent: {}
+[6.919879] (-) TimerEvent: {}
+[6.977233] (px4_ros_com) StdoutLine: {'line': b'[ 29%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OpticalFlow.cpp.o\x1b[0m\n'}
+[7.020002] (-) TimerEvent: {}
+[7.120336] (-) TimerEvent: {}
+[7.220667] (-) TimerEvent: {}
+[7.321014] (-) TimerEvent: {}
+[7.398959] (px4_ros_com) StdoutLine: {'line': b'[ 30%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OpticalFlowPubSubTypes.cpp.o\x1b[0m\n'}
+[7.421130] (-) TimerEvent: {}
+[7.478735] (px4_ros_com) StdoutLine: {'line': b'[ 31%] \x1b[32m\x1b[1mLinking CXX executable second_offboard\x1b[0m\n'}
+[7.521249] (-) TimerEvent: {}
+[7.576932] (px4_ros_com) StdoutLine: {'line': b'[ 32%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/PositionSetpoint.cpp.o\x1b[0m\n'}
+[7.621372] (-) TimerEvent: {}
+[7.698806] (px4_ros_com) StdoutLine: {'line': b'[ 33%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/PositionSetpointPubSubTypes.cpp.o\x1b[0m\n'}
+[7.721494] (-) TimerEvent: {}
+[7.821837] (-) TimerEvent: {}
+[7.856801] (px4_ros_com) StdoutLine: {'line': b'[ 34%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/PositionSetpointTriplet.cpp.o\x1b[0m\n'}
+[7.917934] (px4_ros_com) StdoutLine: {'line': b'[ 34%] Built target second_offboard\n'}
+[7.921949] (-) TimerEvent: {}
+[7.923067] (px4_ros_com) StdoutLine: {'line': b'[ 35%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/PositionSetpointTripletPubSubTypes.cpp.o\x1b[0m\n'}
+[7.980535] (px4_ros_com) StdoutLine: {'line': b'[ 36%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TelemetryStatus.cpp.o\x1b[0m\n'}
+[8.022063] (-) TimerEvent: {}
+[8.122406] (-) TimerEvent: {}
+[8.169698] (px4_ros_com) StdoutLine: {'line': b'[ 37%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TelemetryStatusPubSubTypes.cpp.o\x1b[0m\n'}
+[8.222525] (-) TimerEvent: {}
+[8.322874] (-) TimerEvent: {}
+[8.338571] (px4_ros_com) StdoutLine: {'line': b'[ 38%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/Timesync.cpp.o\x1b[0m\n'}
+[8.422994] (-) TimerEvent: {}
+[8.431992] (px4_ros_com) StdoutLine: {'line': b'[ 39%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TimesyncPubSubTypes.cpp.o\x1b[0m\n'}
+[8.523113] (-) TimerEvent: {}
+[8.620720] (px4_ros_com) StdoutLine: {'line': b'[ 40%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectoryBezier.cpp.o\x1b[0m\n'}
+[8.623221] (-) TimerEvent: {}
+[8.633351] (px4_ros_com) StdoutLine: {'line': b'[ 41%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectoryBezierPubSubTypes.cpp.o\x1b[0m\n'}
+[8.723345] (-) TimerEvent: {}
+[8.823716] (-) TimerEvent: {}
+[8.899140] (px4_ros_com) StdoutLine: {'line': b'[ 42%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleCommand.cpp.o\x1b[0m\n'}
+[8.923840] (-) TimerEvent: {}
+[9.024198] (-) TimerEvent: {}
+[9.124538] (-) TimerEvent: {}
+[9.190362] (px4_ros_com) StdoutLine: {'line': b'[ 43%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleCommandPubSubTypes.cpp.o\x1b[0m\n'}
+[9.224657] (-) TimerEvent: {}
+[9.325002] (-) TimerEvent: {}
+[9.425346] (-) TimerEvent: {}
+[9.496576] (px4_ros_com) StdoutLine: {'line': b'[ 44%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleLocalPositionSetpoint.cpp.o\x1b[0m\n'}
+[9.525472] (-) TimerEvent: {}
+[9.625813] (-) TimerEvent: {}
+[9.726137] (-) TimerEvent: {}
+[9.814264] (px4_ros_com) StdoutLine: {'line': b'[ 45%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleLocalPositionSetpointPubSubTypes.cpp.o\x1b[0m\n'}
+[9.826250] (-) TimerEvent: {}
+[9.926567] (-) TimerEvent: {}
+[10.026906] (-) TimerEvent: {}
+[10.087581] (px4_ros_com) StdoutLine: {'line': b'[ 46%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryBezier.cpp.o\x1b[0m\n'}
+[10.101122] (px4_ros_com) StdoutLine: {'line': b'[ 47%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryBezierPubSubTypes.cpp.o\x1b[0m\n'}
+[10.127026] (-) TimerEvent: {}
+[10.227372] (-) TimerEvent: {}
+[10.327723] (-) TimerEvent: {}
+[10.338187] (px4_ros_com) StdoutLine: {'line': b'[ 48%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryWaypoint.cpp.o\x1b[0m\n'}
+[10.427847] (-) TimerEvent: {}
+[10.528203] (-) TimerEvent: {}
+[10.626877] (px4_ros_com) StdoutLine: {'line': b'[ 49%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryWaypointPubSubTypes.cpp.o\x1b[0m\n'}
+[10.628293] (-) TimerEvent: {}
+[10.629300] (px4_ros_com) StdoutLine: {'line': b'[ 50%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectorySetpoint.cpp.o\x1b[0m\n'}
+[10.728419] (-) TimerEvent: {}
+[10.828749] (-) TimerEvent: {}
+[10.848169] (px4_ros_com) StdoutLine: {'line': b'[ 51%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectorySetpointPubSubTypes.cpp.o\x1b[0m\n'}
+[10.910688] (px4_ros_com) StdoutLine: {'line': b'[ 52%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleMocapOdometry.cpp.o\x1b[0m\n'}
+[10.928872] (-) TimerEvent: {}
+[11.029194] (-) TimerEvent: {}
+[11.069858] (px4_ros_com) StdoutLine: {'line': b'[ 53%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleMocapOdometryPubSubTypes.cpp.o\x1b[0m\n'}
+[11.129319] (-) TimerEvent: {}
+[11.213534] (px4_ros_com) StdoutLine: {'line': b'[ 54%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleVisualOdometry.cpp.o\x1b[0m\n'}
+[11.229447] (-) TimerEvent: {}
+[11.329743] (-) TimerEvent: {}
+[11.430096] (-) TimerEvent: {}
+[11.497374] (px4_ros_com) StdoutLine: {'line': b'[ 55%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleVisualOdometryPubSubTypes.cpp.o\x1b[0m\n'}
+[11.530207] (-) TimerEvent: {}
+[11.630535] (-) TimerEvent: {}
+[11.673424] (px4_ros_com) StdoutLine: {'line': b'[ 56%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/CollisionConstraints.cpp.o\x1b[0m\n'}
+[11.730666] (-) TimerEvent: {}
+[11.830797] (px4_ros_com) StdoutLine: {'line': b'[ 57%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/CollisionConstraintsPubSubTypes.cpp.o\x1b[0m\n'}
+[11.831010] (-) TimerEvent: {}
+[11.931275] (-) TimerEvent: {}
+[12.031600] (-) TimerEvent: {}
+[12.131939] (-) TimerEvent: {}
+[12.232294] (-) TimerEvent: {}
+[12.234078] (px4_ros_com) StdoutLine: {'line': b'[ 58%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/SensorCombined.cpp.o\x1b[0m\n'}
+[12.236463] (px4_ros_com) StdoutLine: {'line': b'[ 59%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/SensorCombinedPubSubTypes.cpp.o\x1b[0m\n'}
+[12.332419] (-) TimerEvent: {}
+[12.432768] (-) TimerEvent: {}
+[12.518145] (px4_ros_com) StdoutLine: {'line': b'[ 60%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TimesyncStatus.cpp.o\x1b[0m\n'}
+[12.532887] (-) TimerEvent: {}
+[12.633244] (-) TimerEvent: {}
+[12.733603] (-) TimerEvent: {}
+[12.780479] (px4_ros_com) StdoutLine: {'line': b'[ 61%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TimesyncStatusPubSubTypes.cpp.o\x1b[0m\n'}
+[12.833737] (-) TimerEvent: {}
+[12.934133] (-) TimerEvent: {}
+[13.034483] (-) TimerEvent: {}
+[13.070649] (px4_ros_com) StdoutLine: {'line': b'[ 62%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectoryWaypoint.cpp.o\x1b[0m\n'}
+[13.098189] (px4_ros_com) StdoutLine: {'line': b'[ 63%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectoryWaypointPubSubTypes.cpp.o\x1b[0m\n'}
+[13.134602] (-) TimerEvent: {}
+[13.234946] (-) TimerEvent: {}
+[13.271146] (px4_ros_com) StdoutLine: {'line': b'[ 64%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleControlMode.cpp.o\x1b[0m\n'}
+[13.335065] (-) TimerEvent: {}
+[13.435405] (-) TimerEvent: {}
+[13.530662] (px4_ros_com) StdoutLine: {'line': b'[ 65%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleControlModePubSubTypes.cpp.o\x1b[0m\n'}
+[13.535525] (-) TimerEvent: {}
+[13.635880] (-) TimerEvent: {}
+[13.653266] (px4_ros_com) StdoutLine: {'line': b'[ 66%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleOdometry.cpp.o\x1b[0m\n'}
+[13.736003] (-) TimerEvent: {}
+[13.836344] (-) TimerEvent: {}
+[13.868502] (px4_ros_com) StdoutLine: {'line': b'[ 67%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleOdometryPubSubTypes.cpp.o\x1b[0m\n'}
+[13.936465] (-) TimerEvent: {}
+[13.982521] (px4_ros_com) StdoutLine: {'line': b'[ 68%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleStatus.cpp.o\x1b[0m\n'}
+[14.036595] (-) TimerEvent: {}
+[14.136949] (-) TimerEvent: {}
+[14.237290] (-) TimerEvent: {}
+[14.263976] (px4_ros_com) StdoutLine: {'line': b'[ 69%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleStatusPubSubTypes.cpp.o\x1b[0m\n'}
+[14.281681] (px4_ros_com) StdoutLine: {'line': b'[ 70%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryWaypointDesired.cpp.o\x1b[0m\n'}
+[14.337413] (-) TimerEvent: {}
+[14.437745] (-) TimerEvent: {}
+[14.538071] (-) TimerEvent: {}
+[14.613813] (px4_ros_com) StdoutLine: {'line': b'[ 71%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryWaypointDesiredPubSubTypes.cpp.o\x1b[0m\n'}
+[14.638186] (-) TimerEvent: {}
+[14.641880] (px4_ros_com) StdoutLine: {'line': b'[ 72%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/CollisionConstraints_Publisher.cpp.o\x1b[0m\n'}
+[14.738303] (-) TimerEvent: {}
+[14.838643] (-) TimerEvent: {}
+[14.863770] (px4_ros_com) StdoutLine: {'line': b'[ 73%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/SensorCombined_Publisher.cpp.o\x1b[0m\n'}
+[14.938761] (-) TimerEvent: {}
+[15.039092] (-) TimerEvent: {}
+[15.139419] (-) TimerEvent: {}
+[15.224576] (px4_ros_com) StdoutLine: {'line': b'[ 74%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/Timesync_Publisher.cpp.o\x1b[0m\n'}
+[15.239543] (-) TimerEvent: {}
+[15.339910] (-) TimerEvent: {}
+[15.440265] (-) TimerEvent: {}
+[15.528953] (px4_ros_com) StdoutLine: {'line': b'[ 75%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TimesyncStatus_Publisher.cpp.o\x1b[0m\n'}
+[15.540382] (-) TimerEvent: {}
+[15.640733] (-) TimerEvent: {}
+[15.741065] (-) TimerEvent: {}
+[15.841402] (-) TimerEvent: {}
+[15.941735] (-) TimerEvent: {}
+[15.988909] (px4_ros_com) StdoutLine: {'line': b'[ 76%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectoryWaypoint_Publisher.cpp.o\x1b[0m\n'}
+[16.041856] (-) TimerEvent: {}
+[16.142194] (-) TimerEvent: {}
+[16.242545] (-) TimerEvent: {}
+[16.306847] (px4_ros_com) StdoutLine: {'line': b'[ 77%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleControlMode_Publisher.cpp.o\x1b[0m\n'}
+[16.342663] (-) TimerEvent: {}
+[16.443020] (-) TimerEvent: {}
+[16.543378] (-) TimerEvent: {}
+[16.643735] (-) TimerEvent: {}
+[16.744091] (-) TimerEvent: {}
+[16.804923] (px4_ros_com) StdoutLine: {'line': b'[ 78%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleOdometry_Publisher.cpp.o\x1b[0m\n'}
+[16.844215] (-) TimerEvent: {}
+[16.944674] (-) TimerEvent: {}
+[17.044994] (-) TimerEvent: {}
+[17.092434] (px4_ros_com) StdoutLine: {'line': b'[ 79%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleStatus_Publisher.cpp.o\x1b[0m\n'}
+[17.145116] (-) TimerEvent: {}
+[17.245460] (-) TimerEvent: {}
+[17.345812] (-) TimerEvent: {}
+[17.403419] (px4_ros_com) StdoutLine: {'line': b'[ 80%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryWaypointDesired_Publisher.cpp.o\x1b[0m\n'}
+[17.445925] (-) TimerEvent: {}
+[17.546277] (-) TimerEvent: {}
+[17.570008] (px4_ros_com) StdoutLine: {'line': b'[ 81%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugArray_Subscriber.cpp.o\x1b[0m\n'}
+[17.646398] (-) TimerEvent: {}
+[17.746738] (-) TimerEvent: {}
+[17.847062] (-) TimerEvent: {}
+[17.947398] (-) TimerEvent: {}
+[17.994402] (px4_ros_com) StdoutLine: {'line': b'[ 82%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugKeyValue_Subscriber.cpp.o\x1b[0m\n'}
+[18.047519] (-) TimerEvent: {}
+[18.149764] (-) TimerEvent: {}
+[18.250123] (-) TimerEvent: {}
+[18.304868] (px4_ros_com) StdoutLine: {'line': b'[ 83%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugValue_Subscriber.cpp.o\x1b[0m\n'}
+[18.354107] (-) TimerEvent: {}
+[18.454447] (-) TimerEvent: {}
+[18.554777] (-) TimerEvent: {}
+[18.655136] (-) TimerEvent: {}
+[18.755818] (-) TimerEvent: {}
+[18.851643] (px4_ros_com) StdoutLine: {'line': b'[ 84%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/DebugVect_Subscriber.cpp.o\x1b[0m\n'}
+[18.855939] (-) TimerEvent: {}
+[18.956299] (-) TimerEvent: {}
+[19.056722] (-) TimerEvent: {}
+[19.157084] (-) TimerEvent: {}
+[19.160259] (px4_ros_com) StdoutLine: {'line': b'[ 85%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OffboardControlMode_Subscriber.cpp.o\x1b[0m\n'}
+[19.257582] (-) TimerEvent: {}
+[19.358102] (-) TimerEvent: {}
+[19.458449] (-) TimerEvent: {}
+[19.558953] (-) TimerEvent: {}
+[19.659443] (-) TimerEvent: {}
+[19.759919] (-) TimerEvent: {}
+[19.860344] (-) TimerEvent: {}
+[19.960687] (-) TimerEvent: {}
+[19.968716] (px4_ros_com) StdoutLine: {'line': b'[ 86%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OnboardComputerStatus_Subscriber.cpp.o\x1b[0m\n'}
+[20.060813] (-) TimerEvent: {}
+[20.161140] (-) TimerEvent: {}
+[20.242052] (px4_ros_com) StdoutLine: {'line': b'[ 87%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/OpticalFlow_Subscriber.cpp.o\x1b[0m\n'}
+[20.261255] (-) TimerEvent: {}
+[20.332201] (px4_ros_com) StdoutLine: {'line': b'[ 88%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/PositionSetpoint_Subscriber.cpp.o\x1b[0m\n'}
+[20.361371] (-) TimerEvent: {}
+[20.461726] (-) TimerEvent: {}
+[20.563540] (-) TimerEvent: {}
+[20.664879] (-) TimerEvent: {}
+[20.764667] (px4_ros_com) StdoutLine: {'line': b'[ 89%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/PositionSetpointTriplet_Subscriber.cpp.o\x1b[0m\n'}
+[20.764906] (-) TimerEvent: {}
+[20.865430] (-) TimerEvent: {}
+[20.965734] (-) TimerEvent: {}
+[21.066073] (-) TimerEvent: {}
+[21.163117] (px4_ros_com) StdoutLine: {'line': b'[ 90%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TelemetryStatus_Subscriber.cpp.o\x1b[0m\n'}
+[21.166187] (-) TimerEvent: {}
+[21.266616] (-) TimerEvent: {}
+[21.366953] (-) TimerEvent: {}
+[21.467314] (-) TimerEvent: {}
+[21.567649] (-) TimerEvent: {}
+[21.668117] (-) TimerEvent: {}
+[21.768458] (-) TimerEvent: {}
+[21.868790] (-) TimerEvent: {}
+[21.969306] (-) TimerEvent: {}
+[22.038890] (px4_ros_com) StdoutLine: {'line': b'[ 91%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/Timesync_Subscriber.cpp.o\x1b[0m\n'}
+[22.069523] (-) TimerEvent: {}
+[22.171895] (-) TimerEvent: {}
+[22.293737] (-) TimerEvent: {}
+[22.394078] (-) TimerEvent: {}
+[22.397669] (px4_ros_com) StdoutLine: {'line': b'[ 92%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectoryBezier_Subscriber.cpp.o\x1b[0m\n'}
+[22.494202] (-) TimerEvent: {}
+[22.594579] (-) TimerEvent: {}
+[22.694904] (-) TimerEvent: {}
+[22.795236] (-) TimerEvent: {}
+[22.855343] (px4_ros_com) StdoutLine: {'line': b'[ 93%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleCommand_Subscriber.cpp.o\x1b[0m\n'}
+[22.895357] (-) TimerEvent: {}
+[22.995770] (-) TimerEvent: {}
+[23.096114] (-) TimerEvent: {}
+[23.196480] (-) TimerEvent: {}
+[23.296891] (-) TimerEvent: {}
+[23.354156] (px4_ros_com) StdoutLine: {'line': b'[ 94%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleLocalPositionSetpoint_Subscriber.cpp.o\x1b[0m\n'}
+[23.397005] (-) TimerEvent: {}
+[23.476412] (px4_ros_com) StdoutLine: {'line': b'[ 95%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryBezier_Subscriber.cpp.o\x1b[0m\n'}
+[23.497124] (-) TimerEvent: {}
+[23.598693] (-) TimerEvent: {}
+[23.699523] (-) TimerEvent: {}
+[23.800058] (-) TimerEvent: {}
+[23.851105] (px4_ros_com) StdoutLine: {'line': b'[ 96%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleTrajectoryWaypoint_Subscriber.cpp.o\x1b[0m\n'}
+[23.900179] (-) TimerEvent: {}
+[24.001030] (-) TimerEvent: {}
+[24.101686] (-) TimerEvent: {}
+[24.192469] (px4_ros_com) StdoutLine: {'line': b'[ 97%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/TrajectorySetpoint_Subscriber.cpp.o\x1b[0m\n'}
+[24.202013] (-) TimerEvent: {}
+[24.302344] (-) TimerEvent: {}
+[24.402882] (-) TimerEvent: {}
+[24.503228] (-) TimerEvent: {}
+[24.603669] (-) TimerEvent: {}
+[24.704096] (-) TimerEvent: {}
+[24.787561] (px4_ros_com) StdoutLine: {'line': b'[ 98%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleMocapOdometry_Subscriber.cpp.o\x1b[0m\n'}
+[24.804215] (-) TimerEvent: {}
+[24.904547] (-) TimerEvent: {}
+[25.004884] (-) TimerEvent: {}
+[25.105218] (-) TimerEvent: {}
+[25.205566] (-) TimerEvent: {}
+[25.305921] (-) TimerEvent: {}
+[25.406252] (-) TimerEvent: {}
+[25.467271] (px4_ros_com) StderrLine: {'line': b"make[2]: *** No rule to make target '/opt/ros/foxy/lib/libfastrtps.so.2.1.3', needed by 'micrortps_agent'.  Stop.\n"}
+[25.467510] (px4_ros_com) StderrLine: {'line': b'make[2]: *** Waiting for unfinished jobs....\n'}
+[25.471803] (px4_ros_com) StdoutLine: {'line': b'[ 99%] \x1b[32mBuilding CXX object CMakeFiles/micrortps_agent.dir/src/micrortps_agent/VehicleVisualOdometry_Subscriber.cpp.o\x1b[0m\n'}
+[25.506370] (-) TimerEvent: {}
+[25.606715] (-) TimerEvent: {}
+[25.707042] (-) TimerEvent: {}
+[25.807386] (-) TimerEvent: {}
+[25.907723] (-) TimerEvent: {}
+[26.008050] (-) TimerEvent: {}
+[26.108394] (-) TimerEvent: {}
+[26.208766] (-) TimerEvent: {}
+[26.309154] (-) TimerEvent: {}
+[26.409406] (-) TimerEvent: {}
+[26.509746] (-) TimerEvent: {}
+[26.610022] (-) TimerEvent: {}
+[26.710443] (-) TimerEvent: {}
+[26.810871] (-) TimerEvent: {}
+[26.911194] (-) TimerEvent: {}
+[27.011423] (-) TimerEvent: {}
+[27.111844] (-) TimerEvent: {}
+[27.212177] (-) TimerEvent: {}
+[27.312432] (-) TimerEvent: {}
+[27.412773] (-) TimerEvent: {}
+[27.513036] (-) TimerEvent: {}
+[27.613371] (-) TimerEvent: {}
+[27.713745] (-) TimerEvent: {}
+[27.814003] (-) TimerEvent: {}
+[27.816332] (px4_ros_com) StderrLine: {'line': b'make[1]: *** [CMakeFiles/Makefile2:163: CMakeFiles/micrortps_agent.dir/all] Error 2\n'}
+[27.816478] (px4_ros_com) StderrLine: {'line': b'make: *** [Makefile:160: all] Error 2\n'}
+[27.817447] (px4_ros_com) CommandEnded: {'returncode': 2}
+[27.914125] (-) TimerEvent: {}
+[28.014367] (-) TimerEvent: {}
+[28.084539] (px4_ros_com) JobEnded: {'identifier': 'px4_ros_com', 'rc': 2}
+[28.095057] (-) EventReactorShutdown: {}

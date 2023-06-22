@@ -1,1 +1,0 @@
-/home/kimseheon/px4_ros_com_ros2-a/build/px4_msgs/rosidl_generator_cpp/px4_msgs/msg/detail/orb_test_medium_wrap_around__builder.hpp

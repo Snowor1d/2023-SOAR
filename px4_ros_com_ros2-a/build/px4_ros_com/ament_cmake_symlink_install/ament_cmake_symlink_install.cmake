@@ -349,6 +349,12 @@ ament_cmake_symlink_install_directory("/home/kimseheon/px4_ros_com_ros2-a/src/px
 # install(DIRECTORY "launch" "DESTINATION" "share/px4_ros_com")
 ament_cmake_symlink_install_directory("/home/kimseheon/px4_ros_com_ros2-a/src/px4_ros_com" DIRECTORY "launch" "DESTINATION" "share/px4_ros_com")
 
+# install(DIRECTORY "launch" "DESTINATION" "share/custom_offboard")
+ament_cmake_symlink_install_directory("/home/kimseheon/px4_ros_com_ros2-a/src/px4_ros_com" DIRECTORY "launch" "DESTINATION" "share/custom_offboard")
+
+# install(DIRECTORY "launch" "DESTINATION" "share/custom_offfboard_timer")
+ament_cmake_symlink_install_directory("/home/kimseheon/px4_ros_com_ros2-a/src/px4_ros_com" DIRECTORY "launch" "DESTINATION" "share/custom_offfboard_timer")
+
 # install(DIRECTORY "test" "DESTINATION" "share/px4_ros_com")
 ament_cmake_symlink_install_directory("/home/kimseheon/px4_ros_com_ros2-a/src/px4_ros_com" DIRECTORY "test" "DESTINATION" "share/px4_ros_com")
 

@@ -97,10 +97,10 @@ custom_executable(examples/listeners sensor_combined_listener)
 custom_executable(examples/listeners vehicle_gps_position_listener)
 custom_executable(examples/advertisers debug_vect_advertiser)
 custom_executable(examples/offboard offboard_control)
-custom_executable(custom_offboard first_offboard)
-custom_executable(custom_offboard second_offboard)
-custom_executable(custom_offboard third_offboard)
-custom_executable(custom_offboard fourth_offboard)
+custom_executable(custom_offboard offboard_try1)
+custom_executable(custom_offboard offboard_try2)
+custom_executable(custom_offboard offboard_try3)
+
 
 ############
 # Install ##
@@ -149,7 +149,6 @@ install(DIRECTORY
   launch
   DESTINATION share/${PROJECT_NAME}
 )
-
 install(DIRECTORY
   launch
   DESTINATION share/custom_offboard
@@ -157,7 +156,7 @@ install(DIRECTORY
 
 install(DIRECTORY
   launch
-  DESTINATION share/custom_offfboard_timer
+  DESTINATION share/custom_offboard_timer
 ) 
 
 ############

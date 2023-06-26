@@ -36,10 +36,12 @@ endif()
 set(USES_DEPRECATED_EXPORT_API "ardent" "bouncy" "crystal" "dashing" "eloquent")
 
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(fastcdr REQUIRED)
 find_package(fastrtps REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
 get_default_rmw_implementation(rmw_implementation)
 find_package("${rmw_implementation}" REQUIRED)
 
@@ -52,6 +54,7 @@ if(ROS_DISTRO IN_LIST ROS_DISTROS)
   find_package(eigen3_cmake_module REQUIRED)
 endif()
 find_package(Eigen3 REQUIRED NO_MODULE)
+include_directories(include)
 
 ###################################
 # Generate micro-RTPS agent code ##
@@ -97,10 +100,10 @@ custom_executable(examples/listeners sensor_combined_listener)
 custom_executable(examples/listeners vehicle_gps_position_listener)
 custom_executable(examples/advertisers debug_vect_advertiser)
 custom_executable(examples/offboard offboard_control)
-custom_executable(custom_offboard offboard_try1)
-custom_executable(custom_offboard offboard_try2)
-custom_executable(custom_offboard offboard_try3)
-
+custom_executable(custom_offboard first_offboard)
+custom_executable(custom_offboard second_offboard)
+custom_executable(custom_offboard third_offboard)
+custom_executable(custom_offboard fourth_offboard)
 
 ############
 # Install ##
@@ -149,6 +152,7 @@ install(DIRECTORY
   launch
   DESTINATION share/${PROJECT_NAME}
 )
+
 install(DIRECTORY
   launch
   DESTINATION share/custom_offboard
@@ -156,9 +160,28 @@ install(DIRECTORY
 
 install(DIRECTORY
   launch
-  DESTINATION share/custom_offboard_timer
+  DESTINATION share/custom_offfboard_timer
 ) 
 
+#install python modules
+ament_python_install_package(${PROJECT_NAME})
+#install python executables
+install(PROGRAMS
+  scripts/pcd_subscriber.py
+  DESTINATION lib/${PROJECT_NAME})
+install(PROGRAMS
+  scripts/pcd_subscriber2.py
+  DESTINATION lib/${PROJECT_NAME})
+install(PROGRAMS
+  scripts/helloworld_publisher.py
+  DESTINATION lib/${PROJECT_NAME})
+install(PROGRAMS
+  scripts/circle_path_offboard.py
+  DESTINATION lib/${PROJECT_NAME})
+  
+install(PROGRAMS
+  scripts/python_offboard.py
+  DESTINATION lib/${PROJECT_NAME})
 ############
 # Testing ##
 ############

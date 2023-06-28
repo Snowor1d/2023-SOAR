@@ -78,14 +78,17 @@ class OffboardControl(Node):
         self.vehicle_odom = VehicleOdometry()
 
 
-        self.waypoint_list = [[0,0,-10], [10,0,-10], [10,10,-10], [10,10,-2]]
-        self.waypoint_velocity = [5, 1, 1, 1]
-        self.waypoint_yaw = [0, 0, 0, 0]
-        self.waypoint_num = 4
+        self.waypoint_list = [[0,0,-5], [8,0,-5], [4,4,-5], [0,0,-5], [0, 0, 0]]
+        self.waypoint_velocity = [2, 0.6, 1.4, 3, 2]
+        self.waypoint_yaw = [0, 1, 1, 1, 0]
+        self.waypoint_num = 5
         self.waypoint_count = 0
         self.waypoint_range = 0.5
         self.correction_range = 1.5
         self.previous_waypoint = [0,0,0]
+        self.wait_in_waypoint = 0
+        self.setpoint_mode = False
+        self.previous_yaw = 0
 
         # Create a timer to publish control commands
         self.timer = self.create_timer(0.1, self.timer_callback)
@@ -125,11 +128,17 @@ class OffboardControl(Node):
         self.publish_vehicle_command(VehicleCommand.VEHICLE_CMD_NAV_LAND)
         self.get_logger().info("Switching to land mode")
 
-    def publish_offboard_control_heartbeat_signal(self):
+    def publish_offboard_control_heartbeat_signal(self, is_p):
         """Publish the offboard control mode."""
         msg = OffboardControlMode()
-        msg.position = False
-        msg.velocity = True
+        if is_p:
+            msg.velocity = False
+            msg.position = True 
+
+        else:
+            msg.velocity = True
+            msg.position = False 
+        
         msg.acceleration = False
         msg.attitude = False
         msg.body_rate = False
@@ -141,23 +150,41 @@ class OffboardControl(Node):
         """Publish the trajectory setpoint."""
         x = self.previous_waypoint[0]
         y = self.previous_waypoint[1]
-        z = self.previous_waypoint[2]
+        
         msg = TrajectorySetpoint()
         msg.x = t_x
         msg.y = t_y
         msg.z = t_z
-        msg.yaw = float(yaw)
+        msg.yaw = float(self.previous_yaw)
+        '''
+        if(t_x!=x):
+            if(t_y-y>0):
+                msg.yaw = float(math.atan((t_y-y)/(t_x-x)))
+            elif(t_y-y<0):
+                msg.yaw = -float(math.atan(abs(t_y-y)/(t_x-x)))
+
+        else:
+            if (t_y-y>0):
+                msg.yaw = (math.pi/4)
+            elif(t_y-y<0):
+                msg.yaw = -(math.pi/4)
+        '''
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
-        self.get_logger().info(f"Publishing position setpoints {[t_x, t_y, t_z]}")
-        self.get_logger().info(f"intended vx vy vz {[msg.vx, msg.vy, msg.vz]}")
-        self.get_logger().info(f"odom vx vy vz {[self.vehicle_odom.vx, self.vehicle_odom.vy, self.vehicle_odom.vz]}")
+        #self.get_logger().info(f"Publishing position setpoints {[t_x, t_y, t_z]}")
+        #self.get_logger().info(f"intended vx vy vz {[msg.vx, msg.vy, msg.vz]}")
+        #self.get_logger().info(f"odom vx vy vz {[self.vehicle_odom.vx, self.vehicle_odom.vy, self.vehicle_odom.vz]}")
+        #self.get_logger().info(f"Controlled by position..")
 
     def publish_velocity_setpoint(self, t_x: float, t_y: float, t_z:float, v:float, yaw:float):
-        
+        pi = math.pi
         x = self.previous_waypoint[0]
         y = self.previous_waypoint[1]
         z = self.previous_waypoint[2]
+        #x = self.vehicle_odom.x
+        #y = self.vehicle_odom.y
+        #z = self.vehicle_odom.z
+        
         msg = TrajectorySetpoint() 
         msg.x = np.nan
         msg.y = np.nan
@@ -166,14 +193,47 @@ class OffboardControl(Node):
         msg.vx = v * ((t_x-x)/(math.sqrt(math.pow(t_x-x,2)+math.pow(t_y-y,2)+math.pow(t_z-z,2))))
         msg.vy = v * ((t_y-y)/(math.sqrt(math.pow(t_x-x,2)+math.pow(t_y-y,2)+math.pow(t_z-z,2))))
         msg.vz = v * ((t_z-z)/(math.sqrt(math.pow(t_x-x,2)+math.pow(t_y-y,2)+math.pow(t_z-z,2))))
-        msg.yaw = float(yaw)
+    
+        diff_x = t_x-x
+        diff_y = t_y-y
+        if(yaw!=0):
+            if(diff_x>0 and diff_y>0):
+                msg.yaw = math.atan(diff_y/diff_x)
+            elif(diff_x<0 and diff_y>0):
+                msg.yaw = pi - math.atan(abs(diff_y/diff_x))
+            elif(diff_x<0 and diff_y<0):
+                msg.yaw = -(pi - math.atan(abs(diff_y/diff_x)))
+            elif(diff_x>0 and diff_y<0):
+                msg.yaw = -(math.atan(abs(diff_y/diff_x)))
+            elif(diff_x==0):
+                if(diff_y==0):
+                    msg.yaw = float(self.previous_yaw)
+                elif(diff_y>0):
+                    msg.yaw = pi/2
+                else:
+                    msg.yaw = -pi/2
+            elif(diff_x<0):
+                if(diff_y==0):
+                    msg.yaw = pi
+            elif(diff_x>0):
+                if(diff_y==0):
+                    msg.yaw = float(0)
+            self.previous_yaw = msg.yaw
+        else:
+            msg.yaw = float(self.previous_yaw)
+
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
-        self.get_logger().info(f"Controlled by velocity..")
-        self.get_logger().info(f"Publishing position setpoints {[t_x, t_y, t_z]}")
-        self.get_logger().info(f"intended vx vy vz {[msg.vx, msg.vy, msg.vz]}")
-        self.get_logger().info(f"odom x y z {[self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]}")
-        self.get_logger().info(f"odom vx vy vz {[self.vehicle_odom.vx, self.vehicle_odom.vy, self.vehicle_odom.vz]}")
+        #self.get_logger().info(f"Controlled by velocity..")
+        #self.get_logger().info(f"Publishing position setpoints {[t_x, t_y, t_z]}")
+        #self.get_logger().info(f"intended vx vy vz {[msg.vx, msg.vy, msg.vz]}")
+        #self.get_logger().info(f"odom x y z {[self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]}")
+        #self.get_logger().info(f"odom vx vy vz {[self.vehicle_odom.vx, self.vehicle_odom.vy, self.vehicle_odom.vz]}")
+
+    def compensation_path_with_odom(self):
+        self.previous_waypoint[0] = self.vehicle_odom.x
+        self.previous_waypoint[1] = self.vehicle_odom.y
+        self.previous_waypoint[2] = self.vehicle_odom.z
 
     def publish_vehicle_command(self, command, **params) -> None:
         """Publish a vehicle command."""
@@ -198,11 +258,10 @@ class OffboardControl(Node):
         #self.get_logger().info(f"local position {[self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]}")
         """Callback function for the timer."""
         
-        self.publish_offboard_control_heartbeat_signal()
         x = self.waypoint_list[self.waypoint_count][0]
         y = self.waypoint_list[self.waypoint_count][1]
         z = self.waypoint_list[self.waypoint_count][2]
-
+        self.publish_offboard_control_heartbeat_signal(True)
         distance_target = math.sqrt(math.pow(x-self.vehicle_odom.x,2)+math.pow(y-self.vehicle_odom.y,2)+math.pow((z-self.vehicle_odom.z),2))
         
         if self.offboard_setpoint_counter == 10: # timer_callback -> node publish 할때마다 실행됨. 즉, publish되는 주기만큼 timer_callback이 실행된다고 이해할 수 있다
@@ -211,19 +270,37 @@ class OffboardControl(Node):
             self.arm()
 
         if self.vehicle_status.nav_state == VehicleStatus.NAVIGATION_STATE_OFFBOARD:
-            if (distance_target < self.correction_range):
+            if ((distance_target < self.correction_range) | (self.setpoint_mode)):
+                self.setpoint_mode = True
+                self.publish_offboard_control_heartbeat_signal(True)
                 self.publish_position_setpoint(float(x), float(y), float(z), self.waypoint_velocity[self.waypoint_count], self.waypoint_yaw[self.waypoint_count])
+
             else:
+                self.publish_offboard_control_heartbeat_signal(False)
                 self.publish_velocity_setpoint(float(x), float(y), float(z), self.waypoint_velocity[self.waypoint_count], self.waypoint_yaw[self.waypoint_count])
 
-        if self.offboard_setpoint_counter < 11:
-            self.offboard_setpoint_counter += 1
+       
+        self.offboard_setpoint_counter += 1
 
         if (distance_target < self.waypoint_range) & (self.waypoint_count != (self.waypoint_num-1)):
-            self.previous_waypoint[0] = self.waypoint_list[self.waypoint_count][0]
-            self.previous_waypoint[1] = self.waypoint_list[self.waypoint_count][1]
-            self.previous_waypoint[2] = self.waypoint_list[self.waypoint_count][2]
-            self.waypoint_count = self.waypoint_count + 1
+            self.setpoint_mode = True
+            self.wait_in_waypoint += 1
+            if (self.wait_in_waypoint == 30):
+                self.previous_waypoint[0] = self.waypoint_list[self.waypoint_count][0]
+                self.previous_waypoint[1] = self.waypoint_list[self.waypoint_count][1]
+                self.previous_waypoint[2] = self.waypoint_list[self.waypoint_count][2]
+                
+                self.get_logger().info(f"{[self.waypoint_list[self.waypoint_count][0], self.waypoint_list[self.waypoint_count][1], self.waypoint_list[self.waypoint_count][2]]}, departed !! ")
+
+                self.waypoint_count = self.waypoint_count + 1
+
+                self.get_logger().info(f"To {[self.waypoint_list[self.waypoint_count][0], self.waypoint_list[self.waypoint_count][1], self.waypoint_list[self.waypoint_count][2]]}, at {self.waypoint_velocity[self.waypoint_count]}m/s")
+                self.wait_in_waypoint = 0
+                self.setpoint_mode = False
+        
+        if (self.offboard_setpoint_counter % 45 == 0):  #timer_callback 주기 1/15라고 가정, 3초마다 보정 
+            self.get_logger().info(f"** path correction with odom **")
+            self.compensation_path_with_odom()
             
             
 

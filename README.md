@@ -1,4 +1,3 @@
-soar fighting ~
 
 soar fighting ~
 

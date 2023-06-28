@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 ############################################################################
 #
-#   Copyright (C) 2022 PX4 Development Team. All rights reserved.
+#   Copyright (C) 2023 SOAR-Snowr1d. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -39,6 +39,7 @@ from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPo
 from px4_msgs.msg import OffboardControlMode, TrajectorySetpoint, VehicleCommand, VehicleLocalPosition, VehicleStatus, VehicleOdometry
 
 import math
+import numpy as np
 
 
 class OffboardControl(Node):
@@ -75,14 +76,15 @@ class OffboardControl(Node):
         self.vehicle_local_position = VehicleLocalPosition()
         self.vehicle_status = VehicleStatus()
         self.vehicle_odom = VehicleOdometry()
-        self.max_height = -5
+
 
         self.waypoint_list = [[0,0,-10], [10,0,-10], [10,10,-10], [10,10,-2]]
-        self.waypoint_velocity = [0.5, 0.5, 0.5, 0.5]
+        self.waypoint_velocity = [5, 1, 1, 1]
         self.waypoint_yaw = [0, 0, 0, 0]
         self.waypoint_num = 4
         self.waypoint_count = 0
-        self.waypoint_range = 1
+        self.waypoint_range = 0.5
+        self.correction_range = 1.5
         self.previous_waypoint = [0,0,0]
 
         # Create a timer to publish control commands
@@ -126,13 +128,14 @@ class OffboardControl(Node):
     def publish_offboard_control_heartbeat_signal(self):
         """Publish the offboard control mode."""
         msg = OffboardControlMode()
-        msg.position = True
+        msg.position = False
         msg.velocity = True
         msg.acceleration = False
         msg.attitude = False
         msg.body_rate = False
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.offboard_control_mode_publisher.publish(msg)
+
 
     def publish_position_setpoint(self, t_x: float, t_y: float, t_z: float, v:float, yaw:float):
         """Publish the trajectory setpoint."""
@@ -143,19 +146,34 @@ class OffboardControl(Node):
         msg.x = t_x
         msg.y = t_y
         msg.z = t_z
+        msg.yaw = float(yaw)
+        msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
+        self.trajectory_setpoint_publisher.publish(msg)
+        self.get_logger().info(f"Publishing position setpoints {[t_x, t_y, t_z]}")
+        self.get_logger().info(f"intended vx vy vz {[msg.vx, msg.vy, msg.vz]}")
+        self.get_logger().info(f"odom vx vy vz {[self.vehicle_odom.vx, self.vehicle_odom.vy, self.vehicle_odom.vz]}")
+
+    def publish_velocity_setpoint(self, t_x: float, t_y: float, t_z:float, v:float, yaw:float):
+        
+        x = self.previous_waypoint[0]
+        y = self.previous_waypoint[1]
+        z = self.previous_waypoint[2]
+        msg = TrajectorySetpoint() 
+        msg.x = np.nan
+        msg.y = np.nan
+        msg.z = np.nan
+
         msg.vx = v * ((t_x-x)/(math.sqrt(math.pow(t_x-x,2)+math.pow(t_y-y,2)+math.pow(t_z-z,2))))
         msg.vy = v * ((t_y-y)/(math.sqrt(math.pow(t_x-x,2)+math.pow(t_y-y,2)+math.pow(t_z-z,2))))
         msg.vz = v * ((t_z-z)/(math.sqrt(math.pow(t_x-x,2)+math.pow(t_y-y,2)+math.pow(t_z-z,2))))
         msg.yaw = float(yaw)
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
+        self.get_logger().info(f"Controlled by velocity..")
         self.get_logger().info(f"Publishing position setpoints {[t_x, t_y, t_z]}")
-        self.get_logger().info(f"Publishing velocity setpoints {[msg.vx, msg.vy, msg.vz]}")
-        self.get_logger().info(f"previous waypoint {[x, y, z]}")
-        self.get_logger().info(f"vx {[msg.vx]}")
-        self.get_logger().info(f"vy {[msg.vy]}")
-        self.get_logger().info(f"vz {[msg.vz]}")
-
+        self.get_logger().info(f"intended vx vy vz {[msg.vx, msg.vy, msg.vz]}")
+        self.get_logger().info(f"odom x y z {[self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]}")
+        self.get_logger().info(f"odom vx vy vz {[self.vehicle_odom.vx, self.vehicle_odom.vy, self.vehicle_odom.vz]}")
 
     def publish_vehicle_command(self, command, **params) -> None:
         """Publish a vehicle command."""
@@ -179,10 +197,13 @@ class OffboardControl(Node):
     def timer_callback(self) -> None:
         #self.get_logger().info(f"local position {[self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]}")
         """Callback function for the timer."""
+        
         self.publish_offboard_control_heartbeat_signal()
         x = self.waypoint_list[self.waypoint_count][0]
         y = self.waypoint_list[self.waypoint_count][1]
         z = self.waypoint_list[self.waypoint_count][2]
+
+        distance_target = math.sqrt(math.pow(x-self.vehicle_odom.x,2)+math.pow(y-self.vehicle_odom.y,2)+math.pow((z-self.vehicle_odom.z),2))
         
         if self.offboard_setpoint_counter == 10: # timer_callback -> node publish 할때마다 실행됨. 즉, publish되는 주기만큼 timer_callback이 실행된다고 이해할 수 있다
                                                  # -> publish가 10번 되었을때 함수 실행. 주기가 1/15면 10/15초에 함수 실행 됨.   
@@ -190,12 +211,15 @@ class OffboardControl(Node):
             self.arm()
 
         if self.vehicle_status.nav_state == VehicleStatus.NAVIGATION_STATE_OFFBOARD:
-            self.publish_position_setpoint(float(x), float(y), float(z), self.waypoint_velocity[self.waypoint_count], self.waypoint_yaw[self.waypoint_count])
+            if (distance_target < self.correction_range):
+                self.publish_position_setpoint(float(x), float(y), float(z), self.waypoint_velocity[self.waypoint_count], self.waypoint_yaw[self.waypoint_count])
+            else:
+                self.publish_velocity_setpoint(float(x), float(y), float(z), self.waypoint_velocity[self.waypoint_count], self.waypoint_yaw[self.waypoint_count])
 
         if self.offboard_setpoint_counter < 11:
             self.offboard_setpoint_counter += 1
 
-        if (math.sqrt(math.pow(x-self.vehicle_odom.x,2)+math.pow(y-self.vehicle_odom.y,2)+math.pow((z-self.vehicle_odom.z),2)) < self.waypoint_range) & (self.waypoint_count != (self.waypoint_num-1)):
+        if (distance_target < self.waypoint_range) & (self.waypoint_count != (self.waypoint_num-1)):
             self.previous_waypoint[0] = self.waypoint_list[self.waypoint_count][0]
             self.previous_waypoint[1] = self.waypoint_list[self.waypoint_count][1]
             self.previous_waypoint[2] = self.waypoint_list[self.waypoint_count][2]

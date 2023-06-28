@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 ############################################################################
 #
-#   Copyright (C) 2023 SOAR-Snowr1d. All rights reserved.
+#   Copyright (C) 2023 SOAR-Snowor1d. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -78,7 +78,7 @@ class OffboardControl(Node):
         self.vehicle_odom = VehicleOdometry()
 
 
-        self.waypoint_list = [[0,0,-5], [8,0,-5], [4,4,-5], [0,0,-5], [0, 0, 0]]
+        self.waypoint_list = [[0,0,-5], [8,0,-5], [2,4,-5], [4,0,-5], [0, 0, 0]]
         self.waypoint_velocity = [2, 0.6, 1.4, 3, 2]
         self.waypoint_yaw = [0, 1, 1, 1, 0]
         self.waypoint_num = 5
@@ -156,19 +156,7 @@ class OffboardControl(Node):
         msg.y = t_y
         msg.z = t_z
         msg.yaw = float(self.previous_yaw)
-        '''
-        if(t_x!=x):
-            if(t_y-y>0):
-                msg.yaw = float(math.atan((t_y-y)/(t_x-x)))
-            elif(t_y-y<0):
-                msg.yaw = -float(math.atan(abs(t_y-y)/(t_x-x)))
-
-        else:
-            if (t_y-y>0):
-                msg.yaw = (math.pi/4)
-            elif(t_y-y<0):
-                msg.yaw = -(math.pi/4)
-        '''
+      
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
         #self.get_logger().info(f"Publishing position setpoints {[t_x, t_y, t_z]}")

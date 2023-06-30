@@ -182,6 +182,23 @@ install(PROGRAMS
 install(PROGRAMS
   scripts/python_offboard.py
   DESTINATION lib/${PROJECT_NAME})
+  
+install(PROGRAMS
+  scripts/pcd_subscriber_writer.py
+  DESTINATION lib/${PROJECT_NAME})
+  
+install(PROGRAMS
+  scripts/soar_control.py
+  DESTINATION lib/${PROJECT_NAME})
+  
+install(PROGRAMS
+  scripts/soar_control2.py
+  DESTINATION lib/${PROJECT_NAME})
+
+install(PROGRAMS
+  scripts/soar_control3.py
+  DESTINATION lib/${PROJECT_NAME})
+  
 ############
 # Testing ##
 ############

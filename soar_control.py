@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 ############################################################################
 #
-#   Copyright (C) 2023 SOAR-Snowor1d. All rights reserved.
+#   Copyright (C) 2023 SOAR-Snowr1d. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -46,7 +46,7 @@ class OffboardControl(Node):
     """Node for controlling a vehicle in offboard mode."""
 
     def __init__(self) -> None:
-        super().__init__('offboard_control_takeoff_and_land')
+        super().__init__('SOAR_HAVE_CONTROL')
 
         # Configure QoS profile for publishing and subscribing
         qos_profile = QoSProfile(
@@ -78,10 +78,10 @@ class OffboardControl(Node):
         self.vehicle_odom = VehicleOdometry()
 
 
-        self.waypoint_list = [[0,0,-5], [8,0,-5], [2,4,-5], [4,0,-5], [0, 0, 0]]
-        self.waypoint_velocity = [2, 0.6, 1.4, 3, 2]
-        self.waypoint_yaw = [0, 1, 1, 1, 0]
-        self.waypoint_num = 5
+        self.waypoint_list = [[0,0,-2], [8,0,-2], [4,4,-2], [0,0,-2], [5,9,-2], [0, 0, -2], [0, 0, 0]]
+        self.waypoint_velocity = [2, 0.6, 1.4, 1.4, 2, 2, 2]
+        self.waypoint_yaw = [0, 1, 1, 1, 1, 1, 0]
+        self.waypoint_num = len(self.waypoint_list)
         self.waypoint_count = 0
         self.waypoint_range = 0.5
         self.correction_range = 1.5
@@ -89,9 +89,21 @@ class OffboardControl(Node):
         self.wait_in_waypoint = 0
         self.setpoint_mode = False
         self.previous_yaw = 0
+        self.distance_target = 0
+    
+        self.is_new_go = 0
+        self.is_departed = 0
+
+        self.mission_ladder = 0
+        self.mission_delivery = 0
+        
+        self.theta = 0
+        self.initial_theta = -1
+        self.circle_path = 1
 
         # Create a timer to publish control commands
-        self.timer = self.create_timer(0.1, self.timer_callback)
+        self.dt = 0.1
+        self.timer = self.create_timer(self.dt, self.timer_callback)
     
     def vehicle_odom_callback(self, vehicle_odom):
         self.vehicle_odom = vehicle_odom
@@ -156,7 +168,19 @@ class OffboardControl(Node):
         msg.y = t_y
         msg.z = t_z
         msg.yaw = float(self.previous_yaw)
-      
+        '''
+        if(t_x!=x):
+            if(t_y-y>0):
+                msg.yaw = float(math.atan((t_y-y)/(t_x-x)))
+            elif(t_y-y<0):
+                msg.yaw = -float(math.atan(abs(t_y-y)/(t_x-x)))
+
+        else:
+            if (t_y-y>0):
+                msg.yaw = (math.pi/4)
+            elif(t_y-y<0):
+                msg.yaw = -(math.pi/4)
+        '''
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
         #self.get_logger().info(f"Publishing position setpoints {[t_x, t_y, t_z]}")
@@ -242,56 +266,136 @@ class OffboardControl(Node):
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.vehicle_command_publisher.publish(msg)
 
-    def timer_callback(self) -> None:
-        #self.get_logger().info(f"local position {[self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]}")
-        """Callback function for the timer."""
-        
-        x = self.waypoint_list[self.waypoint_count][0]
-        y = self.waypoint_list[self.waypoint_count][1]
-        z = self.waypoint_list[self.waypoint_count][2]
+    def goto_waypoint(self, to_x, to_y, to_z, velo, yaw):
+        if(self.is_new_go == 1):
+            self.get_logger().info(f"To {[to_x, to_y, to_z]}, at {velo}m/s")
+            self.is_new_go = 0
+        x= to_x
+        y= to_y
+        z= to_z
         self.publish_offboard_control_heartbeat_signal(True)
-        distance_target = math.sqrt(math.pow(x-self.vehicle_odom.x,2)+math.pow(y-self.vehicle_odom.y,2)+math.pow((z-self.vehicle_odom.z),2))
+        self.distance_target = math.sqrt(math.pow(x-self.vehicle_odom.x,2)+math.pow(y-self.vehicle_odom.y,2)+math.pow((z-self.vehicle_odom.z),2))
         
-        if self.offboard_setpoint_counter == 10: # timer_callback -> node publish 할때마다 실행됨. 즉, publish되는 주기만큼 timer_callback이 실행된다고 이해할 수 있다
-                                                 # -> publish가 10번 되었을때 함수 실행. 주기가 1/15면 10/15초에 함수 실행 됨.   
-            self.engage_offboard_mode()
-            self.arm()
-
         if self.vehicle_status.nav_state == VehicleStatus.NAVIGATION_STATE_OFFBOARD:
-            if ((distance_target < self.correction_range) | (self.setpoint_mode)):
+            if ((self.distance_target < self.correction_range) | (self.setpoint_mode)):
                 self.setpoint_mode = True
                 self.publish_offboard_control_heartbeat_signal(True)
-                self.publish_position_setpoint(float(x), float(y), float(z), self.waypoint_velocity[self.waypoint_count], self.waypoint_yaw[self.waypoint_count])
-
+                self.publish_position_setpoint(float(x), float(y), float(z), velo, yaw)
             else:
                 self.publish_offboard_control_heartbeat_signal(False)
-                self.publish_velocity_setpoint(float(x), float(y), float(z), self.waypoint_velocity[self.waypoint_count], self.waypoint_yaw[self.waypoint_count])
+                self.publish_velocity_setpoint(float(x), float(y), float(z), velo, yaw)
 
-       
-        self.offboard_setpoint_counter += 1
-
-        if (distance_target < self.waypoint_range) & (self.waypoint_count != (self.waypoint_num-1)):
+        if (self.distance_target < self.waypoint_range) & (self.waypoint_count != (self.waypoint_num-1)):
             self.setpoint_mode = True
             self.wait_in_waypoint += 1
             if (self.wait_in_waypoint == 30):
                 self.previous_waypoint[0] = self.waypoint_list[self.waypoint_count][0]
                 self.previous_waypoint[1] = self.waypoint_list[self.waypoint_count][1]
                 self.previous_waypoint[2] = self.waypoint_list[self.waypoint_count][2]
-                
-                self.get_logger().info(f"{[self.waypoint_list[self.waypoint_count][0], self.waypoint_list[self.waypoint_count][1], self.waypoint_list[self.waypoint_count][2]]}, departed !! ")
 
-                self.waypoint_count = self.waypoint_count + 1
+                self.get_logger().info(f"{[to_x, to_y, to_z]}, departed !! ")
 
-                self.get_logger().info(f"To {[self.waypoint_list[self.waypoint_count][0], self.waypoint_list[self.waypoint_count][1], self.waypoint_list[self.waypoint_count][2]]}, at {self.waypoint_velocity[self.waypoint_count]}m/s")
+                self.is_new_go = 1
+                self.is_departed = 1
                 self.wait_in_waypoint = 0
                 self.setpoint_mode = False
-        
+
         if (self.offboard_setpoint_counter % 45 == 0):  #timer_callback 주기 1/15라고 가정, 3초마다 보정 
             self.get_logger().info(f"** path correction with odom **")
             self.compensation_path_with_odom()
-            
-            
 
+    def circle_path_publish(self, t_x: float, t_y: float, t_z: float, w:float, radius):
+
+        pi = math.pi
+        diff_x = self.vehicle_odom.x - t_x
+        diff_y = self.vehicle_odom.y - t_y
+        if(math.sqrt(pow(diff_x,2)+pow(diff_y,2)) > (radius+1)):
+            self.get_logger().info(f" going to central point of circle ")
+            self.goto_waypoint(t_x, t_y, t_z, self.waypoint_velocity[self.waypoint_count], 1)
+            return
+        self.publish_offboard_control_heartbeat_signal(True)
+        msg = TrajectorySetpoint()
+        if(self.initial_theta ==-1):
+            self.get_logger().info(f" {[t_x, t_y, t_z]} circle path with r{radius} ")
+            if(diff_x>0 and diff_y>0):
+                self.theta = math.atan(diff_y/diff_x)
+            elif(diff_x<0 and diff_y>0):
+                self.theta = pi - math.atan(abs(diff_y/diff_x))
+            elif(diff_x<0 and diff_y<0):
+                self.theta = -(pi - math.atan(abs(diff_y/diff_x)))
+            elif(diff_x>0 and diff_y<0):
+                self.theta = -(math.atan(abs(diff_y/diff_x)))
+            elif(diff_x==0):
+                if(diff_y==0):
+                    self.theta = float(self.previous_yaw)
+                elif(diff_y>0):
+                    self.theta = pi/2
+                else:
+                    self.theta = -pi/2
+            elif(diff_x<0):
+                if(diff_y==0):
+                    self.theta = pi
+            elif(diff_x>0):
+                if(diff_y==0):
+                    self.theta = float(0)
+            self.initial_theta = self.theta
+        msg.x = t_x+radius * np.cos(self.theta)
+        msg.y = t_y+radius * np.sin(self.theta)
+        msg.z = t_z
+        msg.yaw = self.theta + w * self.dt + math.pi # (90 degree)
+        self.theta = self.theta + w * self.dt
+        msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
+        self.trajectory_setpoint_publisher.publish(msg)
+
+    def mission_check(self):
+        pass
+
+    def mission_ladder(self):
+        pass
+    
+    def mission_delivery(self):
+        pass
+        
+
+    def timer_callback(self) -> None:
+        #self.get_logger().info(f"local position {[self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]}")
+        """Callback function for the timer."""
+        x = float(self.waypoint_list[self.waypoint_count][0])
+        y = float(self.waypoint_list[self.waypoint_count][1])
+        z = float(self.waypoint_list[self.waypoint_count][2])
+        v = float(self.waypoint_velocity[self.waypoint_count])
+        yaw = float(self.waypoint_yaw[self.waypoint_count])
+        
+        if self.offboard_setpoint_counter == 10:
+            self.engage_offboard_mode()
+            self.arm()
+        
+        self.mission_check
+
+        if(self.mission_ladder == 1):
+            pass
+
+        elif(self.mission_delivery == 1):
+            pass
+
+        elif(self.waypoint_count == 3 and self.circle_path == 1): # 몇 번째 waypoint를 중심으로 돌고 싶은지
+            self.circle_path_publish(x, y, z, 0.2, 3)
+            if (self.theta-self.initial_theta > math.pi *2 ): # 한바퀴 돌기
+                self.circle_path = 0
+                self.waypoint_count += 1
+
+        else:
+            self.goto_waypoint(x, y, z, v, yaw)
+       
+            if(self.is_departed == 1 and (self.waypoint_count < self.waypoint_num)): # next waypoint update
+                self.waypoint_count +=1
+                self.is_departed = 0
+        
+        self.offboard_setpoint_counter += 1
+       
+
+       
+        
 def main(args=None) -> None:
     print('Starting offboard control node...')
     rclpy.init(args=args)

@@ -160,7 +160,7 @@ install(DIRECTORY
 
 install(DIRECTORY
   launch
-  DESTINATION share/custom_offfboard_timer
+  DESTINATION share/custom_offboard_timer
 ) 
 
 #install python modules

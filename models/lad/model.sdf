@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <model name="lad">
+    <pose>0 0 0 0 0 0</pose>
+    <static>true</static>
+    <link name="link">
+      <inertial>
+        <mass>2500.0</mass>
+        <inertia>
+          <ixx>150.0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>300.0</iyy>
+          <iyz>0</iyz>
+          <izz>200.0</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <box>
+              <size>6.5 2.8 3.2</size>
+          </box>
+        </geometry>
+	<surface>
+          <contact>
+            <ode>
+              <max_vel>0.1</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://lad/meshes/lad.dae</uri>
+          </mesh>
+	</geometry>
+      </visual>
+    </link>
+  </model>
+  <model name="terrain">
+    <static>true</static>
+    <link name="link">
+      <collision name="collision">
+        <geometry>
+          <heightmap>
+            <uri>model://ground_plane</uri>
+            <size>100 100 10</size>  <!-- 지형 크기 (가로, 세로, 높이) -->
+            <pos>0 0 0</pos>  <!-- 지형 위치 -->
+          </heightmap>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <heightmap>
+            <uri>model://ground_plane</uri>
+            <size>100 100 10</size>
+            <pos>0 0 0</pos>
+          </heightmap>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>
+

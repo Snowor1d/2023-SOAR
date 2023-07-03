@@ -79,17 +79,19 @@ class OffboardControl(Node):
 
 
         self.waypoint_list = [[0,0,-2], [8,0,-2], [4,4,-2], [0,0,-2], [5,9,-2], [0, 0, -2], [0, 0, 0]]
-        self.waypoint_velocity = [2, 0.6, 1.4, 1.4, 2, 2, 2]
+        self.waypoint_velocity = [2, 0.4, 0.6, 0.8, 1, 1.2, 2]
         self.waypoint_yaw = [0, 1, 1, 1, 1, 1, 0]
         self.waypoint_num = len(self.waypoint_list)
         self.waypoint_count = 0
-        self.waypoint_range = 0.5
-        self.correction_range = 1.5
+        self.waypoint_range = 0.3
+        self.correction_range = 2.5
         self.previous_waypoint = [0,0,0]
         self.wait_in_waypoint = 0
         self.setpoint_mode = False
         self.previous_yaw = 0
         self.distance_target = 0
+        self.is_go_to_center = 0
+        self.stable_counter = 0
     
         self.is_new_go = 0
         self.is_departed = 0
@@ -188,6 +190,16 @@ class OffboardControl(Node):
         #self.get_logger().info(f"odom vx vy vz {[self.vehicle_odom.vx, self.vehicle_odom.vy, self.vehicle_odom.vz]}")
         #self.get_logger().info(f"Controlled by position..")
 
+    def stable_depart_publish(self, t_x: float, t_y : float, t_z : float, v:float, yaw:float):
+        pi = math.pi
+        x= self.previous_waypoint[0]
+        y= self.previous_waypoint[1]
+        z= self.previous_waypoint[2]
+        self.stable_counter+=1
+        if(self.stable_counter % 3==0):
+            self.compensation_path_with_odom
+        self.publish_velocity_setpoint(t_x, t_y, t_z, v*(pow(self.distance_target,1)/pow(self.correction_range,1)), 0)
+
     def publish_velocity_setpoint(self, t_x: float, t_y: float, t_z:float, v:float, yaw:float):
         pi = math.pi
         x = self.previous_waypoint[0]
@@ -209,27 +221,7 @@ class OffboardControl(Node):
         diff_x = t_x-x
         diff_y = t_y-y
         if(yaw!=0):
-            if(diff_x>0 and diff_y>0):
-                msg.yaw = math.atan(diff_y/diff_x)
-            elif(diff_x<0 and diff_y>0):
-                msg.yaw = pi - math.atan(abs(diff_y/diff_x))
-            elif(diff_x<0 and diff_y<0):
-                msg.yaw = -(pi - math.atan(abs(diff_y/diff_x)))
-            elif(diff_x>0 and diff_y<0):
-                msg.yaw = -(math.atan(abs(diff_y/diff_x)))
-            elif(diff_x==0):
-                if(diff_y==0):
-                    msg.yaw = float(self.previous_yaw)
-                elif(diff_y>0):
-                    msg.yaw = pi/2
-                else:
-                    msg.yaw = -pi/2
-            elif(diff_x<0):
-                if(diff_y==0):
-                    msg.yaw = pi
-            elif(diff_x>0):
-                if(diff_y==0):
-                    msg.yaw = float(0)
+            msg.yaw = math.atan2(diff_y,diff_x)
             self.previous_yaw = msg.yaw
         else:
             msg.yaw = float(self.previous_yaw)
@@ -279,8 +271,8 @@ class OffboardControl(Node):
         if self.vehicle_status.nav_state == VehicleStatus.NAVIGATION_STATE_OFFBOARD:
             if ((self.distance_target < self.correction_range) | (self.setpoint_mode)):
                 self.setpoint_mode = True
-                self.publish_offboard_control_heartbeat_signal(True)
-                self.publish_position_setpoint(float(x), float(y), float(z), velo, yaw)
+                self.publish_offboard_control_heartbeat_signal(False)
+                self.stable_depart_publish(float(x), float(y), float(z), velo, yaw)
             else:
                 self.publish_offboard_control_heartbeat_signal(False)
                 self.publish_velocity_setpoint(float(x), float(y), float(z), velo, yaw)
@@ -288,7 +280,7 @@ class OffboardControl(Node):
         if (self.distance_target < self.waypoint_range) & (self.waypoint_count != (self.waypoint_num-1)):
             self.setpoint_mode = True
             self.wait_in_waypoint += 1
-            if (self.wait_in_waypoint == 30):
+            if (self.wait_in_waypoint == 20):
                 self.previous_waypoint[0] = self.waypoint_list[self.waypoint_count][0]
                 self.previous_waypoint[1] = self.waypoint_list[self.waypoint_count][1]
                 self.previous_waypoint[2] = self.waypoint_list[self.waypoint_count][2]
@@ -305,39 +297,21 @@ class OffboardControl(Node):
             self.compensation_path_with_odom()
 
     def circle_path_publish(self, t_x: float, t_y: float, t_z: float, w:float, radius):
-
+        msg = TrajectorySetpoint() 
         pi = math.pi
         diff_x = self.vehicle_odom.x - t_x
         diff_y = self.vehicle_odom.y - t_y
         if(math.sqrt(pow(diff_x,2)+pow(diff_y,2)) > (radius+1)):
-            self.get_logger().info(f" going to central point of circle ")
+            if(self.is_go_to_center==0):
+                self.get_logger().info(f" going to central point of circle ")
+                self.is_go_to_center = 1
             self.goto_waypoint(t_x, t_y, t_z, self.waypoint_velocity[self.waypoint_count], 1)
             return
         self.publish_offboard_control_heartbeat_signal(True)
-        msg = TrajectorySetpoint()
         if(self.initial_theta ==-1):
             self.get_logger().info(f" {[t_x, t_y, t_z]} circle path with r{radius} ")
-            if(diff_x>0 and diff_y>0):
-                self.theta = math.atan(diff_y/diff_x)
-            elif(diff_x<0 and diff_y>0):
-                self.theta = pi - math.atan(abs(diff_y/diff_x))
-            elif(diff_x<0 and diff_y<0):
-                self.theta = -(pi - math.atan(abs(diff_y/diff_x)))
-            elif(diff_x>0 and diff_y<0):
-                self.theta = -(math.atan(abs(diff_y/diff_x)))
-            elif(diff_x==0):
-                if(diff_y==0):
-                    self.theta = float(self.previous_yaw)
-                elif(diff_y>0):
-                    self.theta = pi/2
-                else:
-                    self.theta = -pi/2
-            elif(diff_x<0):
-                if(diff_y==0):
-                    self.theta = pi
-            elif(diff_x>0):
-                if(diff_y==0):
-                    self.theta = float(0)
+            self.theta = math.atan(diff_y, diff_x)
+          
             self.initial_theta = self.theta
         msg.x = t_x+radius * np.cos(self.theta)
         msg.y = t_y+radius * np.sin(self.theta)
@@ -377,13 +351,13 @@ class OffboardControl(Node):
 
         elif(self.mission_delivery == 1):
             pass
-
-        elif(self.waypoint_count == 3 and self.circle_path == 1): # 몇 번째 waypoint를 중심으로 돌고 싶은지
-            self.circle_path_publish(x, y, z, 0.2, 3)
-            if (self.theta-self.initial_theta > math.pi *2 ): # 한바퀴 돌기
-                self.circle_path = 0
-                self.waypoint_count += 1
-
+        
+        #elif(self.waypoint_count == 3 and self.circle_path == 1): # 몇 번째 waypoint를 중심으로 돌고 싶은지
+        #    self.circle_path_publish(x, y, z, 0.2, 3)
+        #    if (self.theta-self.initial_theta > math.pi *2 ): # 한바퀴 돌기
+        #        self.circle_path = 0
+        #        self.waypoint_count += 1
+        #        self.is_go_to_center = 0
         else:
             self.goto_waypoint(x, y, z, v, yaw)
        

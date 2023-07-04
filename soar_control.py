@@ -79,7 +79,7 @@ class OffboardControl(Node):
 
 
         self.waypoint_list = [[0,0,-2], [8,0,-2], [4,4,-2], [0,0,-2], [5,9,-2], [0, 0, -2], [0, 0, 0]]
-        self.waypoint_velocity = [2, 0.4, 0.6, 0.8, 1, 1.2, 2]
+        self.waypoint_velocity = [2, 0.5, 0.6, 0.7, 0.8, 1, 2]
         self.waypoint_yaw = [0, 1, 1, 1, 1, 1, 0]
         self.waypoint_num = len(self.waypoint_list)
         self.waypoint_count = 0
@@ -198,7 +198,16 @@ class OffboardControl(Node):
         self.stable_counter+=1
         if(self.stable_counter % 3==0):
             self.compensation_path_with_odom
-        self.publish_velocity_setpoint(t_x, t_y, t_z, v*(pow(self.distance_target,1)/pow(self.correction_range,1)), 0)
+        if(self.distance_target<self.waypoint_range):
+            if(v<0.65):
+                self.publish_velocity_setpoint(t_x, t_y, t_z, v*(self.distance_target/self.correction_range), 0)
+                return
+            self.publish_velocity_setpoint(t_x, t_y, t_z, v*(pow(self.distance_target,2)/pow(self.correction_range,2)),0)
+            return
+        elif(v<0.65):
+            self.publish_velocity_setpoint(t_x, t_y, t_z, v*(math.sqrt(self.distance_target)/math.sqrt(self.correction_range)), 0)
+            return 
+        self.publish_velocity_setpoint(t_x, t_y, t_z, v*(self.distance_target/self.correction_range), 0)
 
     def publish_velocity_setpoint(self, t_x: float, t_y: float, t_z:float, v:float, yaw:float):
         pi = math.pi

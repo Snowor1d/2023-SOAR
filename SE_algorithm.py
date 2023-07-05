@@ -27,7 +27,8 @@ class SE:
             distance_target = math.sqrt((i[0] - now_x) ** 2 + (i[1] - now_y) ** 2) - i[2]
             if distance_target < safe_radius:
                 safe_radius = distance_target
-
+        if ((math.sqrt((t_x - now_x) ** 2 + (t_y - now_y) ** 2))/2 < safe_radius):
+            safe_radius = (math.sqrt((t_x - now_x) ** 2 + (t_y - now_y) ** 2))/2
         generate_list = []
         if safe_radius < 1:
             generate_circle_num = 5
@@ -108,6 +109,7 @@ class SE:
         for i in final_path:
             print("to waypoint :", i[0], ",", i[1])
         return final_path
+
 
 '''
 se1 = SE()

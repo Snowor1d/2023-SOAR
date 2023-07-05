@@ -78,14 +78,14 @@ class OffboardControl(Node):
         self.vehicle_status = VehicleStatus()
         self.vehicle_odom = VehicleOdometry()
 
-
+        self.waypoint_contest = [[0,0,-2], [70, 30, -2], [140, 100, -2]]
         self.waypoint_list = [[0,0,-2], [6,0,-2], [-6,0,-2], [6,0,-2], [9,4,-2], [6, 0, -2], [6, 0, 0]]
         #                      way1     mission1     way2     mission2     way3        way1       landing
         self.waypoint_velocity = [2, 0.8, 0.8, 0.8, 0.8, 0.8, 2]
         self.waypoint_yaw = [0, 1, 1, 1, 1, 1, 0]
         self.waypoint_num = len(self.waypoint_list)
         self.waypoint_count = 0
-        self.waypoint_range = 0.3
+        self.waypoint_range = 0.4
         self.correction_range = 2.5
         self.previous_waypoint = [0,0,0]
         self.wait_in_waypoint = 0
@@ -94,6 +94,7 @@ class OffboardControl(Node):
         self.distance_target = 0
         self.is_go_to_center = 0
         self.stable_counter = 0
+        self.stable_odom = [0, 0, 0]
     
         self.is_new_go = 0
         self.is_departed = 0
@@ -187,12 +188,21 @@ class OffboardControl(Node):
 
     def stable_depart_publish(self, t_x: float, t_y : float, t_z : float, v:float, yaw:float):
         pi = math.pi
-        x= self.previous_waypoint[0]
-        y= self.previous_waypoint[1]
-        z= self.previous_waypoint[2]
+        self.previous_waypoint[0] = self.vehicle_odom.x
+        self.previous_waypoint[1] = self.vehicle_odom.y
+        self.previous_waypoint[2] = self.vehicle_odom.z
         self.stable_counter+=1
+        
+        self.stable_odom[0] += self.vehicle_odom.x
+        self.stable_odom[1] += self.vehicle_odom.y
+        self.stable_odom[2] += self.vehicle_odom.z
+        
         if(self.stable_counter % 3==0):
-            self.compensation_path_with_odom
+            self.previous_waypoint[0] = self.stable_odom[0]/3
+            self.previous_waypoint[1] = self.stable_odom[1]/3
+            self.previous_waypoint[2] = self.stable_odom[2]/3
+            self.stable_odom = [0, 0, 0]
+
         if(self.distance_target<self.waypoint_range):
             if(v<0.65):
                 self.publish_velocity_setpoint(t_x, t_y, t_z, v*(self.distance_target/self.correction_range), 0)
@@ -282,7 +292,7 @@ class OffboardControl(Node):
         if (self.distance_target < self.waypoint_range) & (self.waypoint_count != (self.waypoint_num-1)):
             self.setpoint_mode = True
             self.wait_in_waypoint += 1
-            if (self.wait_in_waypoint == 20):
+            if (self.wait_in_waypoint == 10):
                 self.previous_waypoint[0] = self.vehicle_odom.x
                 self.previous_waypoint[1] = self.vehicle_odom.y
                 self.previous_waypoint[2] = self.vehicle_odom.z
@@ -295,7 +305,7 @@ class OffboardControl(Node):
                 self.setpoint_mode = False
 
         if (self.offboard_setpoint_counter % 45 == 0):  #timer_callback 주기 1/15라고 가정, 3초마다 보정 
-            self.get_logger().info(f"** path correction with odom **")
+            #self.get_logger().info(f"** path correction with odom **")
             self.compensation_path_with_odom()
 
     def circle_path_publish(self, t_x: float, t_y: float, t_z: float, w:float, radius):
@@ -351,6 +361,14 @@ class OffboardControl(Node):
             self.is_mission_started = 0
             self.ladder_mission_count = 0
             self.is_mission_ladder_finished = 1
+    
+    def make_points_for_contest(self, waypoint_1, waypoint_2, waypoint_3):
+        distance_w1_w2 = math.sqrt(pow(waypoint_1[0]-waypoint_2[0],2)+pow(waypoint_1[1]-waypoint_2[1],2)+pow(waypoint_1[2]-waypoint_2[2], 2))
+        distance_w2_w3 = math.sqrt(pow(waypoint_2[0]-waypoint_3[0],2)+pow(waypoint_2[1]-waypoint_3[1],2)+pow(waypoint_2[2]-waypoint_3[2], 2))
+        mission_point_1 = [waypoint_2[0]-(8.5*((waypoint_2[0]-waypoint_1[0])/distance_w1_w2)), waypoint_2[1]-(8.5*((waypoint_2[1]-waypoint_1[1])/distance_w1_w2)), waypoint_1[2]]
+        mission_point_2 = [waypoint_2[0]+(8.5*((waypoint_3[0]-waypoint_2[0])/distance_w2_w3)), waypoint_2[1]+(8.5*((waypoint_3[1]-waypoint_2[1])/distance_w2_w3)), waypoint_2[2]]
+        self.waypoint_list = [waypoint_1, mission_point_1, waypoint_2, mission_point_2, waypoint_3, waypoint_1, [waypoint_1[0], waypoint_1[1], 0]]
+        
 
     
     def mission_delivery(self):
@@ -358,6 +376,7 @@ class OffboardControl(Node):
         
 
     def timer_callback(self) -> None:
+        
         #self.get_logger().info(f"local position {[self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]}")
         """Callback function for the timer."""
         x = float(self.waypoint_list[self.waypoint_count][0])
@@ -369,6 +388,7 @@ class OffboardControl(Node):
         if self.offboard_setpoint_counter == 10:
             self.engage_offboard_mode()
             self.arm()
+            self.make_points_for_contest(self.waypoint_contest[0], self.waypoint_contest[1], self.waypoint_contest[2])
         
         if(self.is_mission_ladder == 1 and self.waypoint_count == 2 and self.is_mission_ladder_finished == 0):
             self.mission_ladder()

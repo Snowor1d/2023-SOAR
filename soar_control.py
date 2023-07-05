@@ -32,7 +32,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 ############################################################################
-
+import sys
+from SE_algorithm import SE
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
@@ -78,8 +79,9 @@ class OffboardControl(Node):
         self.vehicle_odom = VehicleOdometry()
 
 
-        self.waypoint_list = [[0,0,-2], [8,0,-2], [4,4,-2], [0,0,-2], [5,9,-2], [0, 0, -2], [0, 0, 0]]
-        self.waypoint_velocity = [2, 0.5, 0.6, 0.7, 0.8, 1, 2]
+        self.waypoint_list = [[0,0,-2], [6,0,-2], [-6,0,-2], [6,0,-2], [9,4,-2], [6, 0, -2], [6, 0, 0]]
+        #                      way1     mission1     way2     mission2     way3        way1       landing
+        self.waypoint_velocity = [2, 0.8, 0.8, 0.8, 0.8, 0.8, 2]
         self.waypoint_yaw = [0, 1, 1, 1, 1, 1, 0]
         self.waypoint_num = len(self.waypoint_list)
         self.waypoint_count = 0
@@ -95,9 +97,17 @@ class OffboardControl(Node):
     
         self.is_new_go = 0
         self.is_departed = 0
+        
+        
+        #variables for ladder
+        self.is_mission_ladder = 0
+        self.is_mission_delivery = 0
+        self.is_mission_started = 0
+        self.ladder_mission_count = 0
+        self.is_ladder_mission_finished = 0
 
-        self.mission_ladder = 0
-        self.mission_delivery = 0
+        self.real_obstacle_list = [[0, 0, 1]]
+        self.waypoint_for_ladder = []
         
         self.theta = 0
         self.initial_theta = -1
@@ -170,25 +180,10 @@ class OffboardControl(Node):
         msg.y = t_y
         msg.z = t_z
         msg.yaw = float(self.previous_yaw)
-        '''
-        if(t_x!=x):
-            if(t_y-y>0):
-                msg.yaw = float(math.atan((t_y-y)/(t_x-x)))
-            elif(t_y-y<0):
-                msg.yaw = -float(math.atan(abs(t_y-y)/(t_x-x)))
-
-        else:
-            if (t_y-y>0):
-                msg.yaw = (math.pi/4)
-            elif(t_y-y<0):
-                msg.yaw = -(math.pi/4)
-        '''
+ 
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
-        #self.get_logger().info(f"Publishing position setpoints {[t_x, t_y, t_z]}")
-        #self.get_logger().info(f"intended vx vy vz {[msg.vx, msg.vy, msg.vz]}")
-        #self.get_logger().info(f"odom vx vy vz {[self.vehicle_odom.vx, self.vehicle_odom.vy, self.vehicle_odom.vz]}")
-        #self.get_logger().info(f"Controlled by position..")
+
 
     def stable_depart_publish(self, t_x: float, t_y : float, t_z : float, v:float, yaw:float):
         pi = math.pi
@@ -214,18 +209,21 @@ class OffboardControl(Node):
         x = self.previous_waypoint[0]
         y = self.previous_waypoint[1]
         z = self.previous_waypoint[2]
-        #x = self.vehicle_odom.x
-        #y = self.vehicle_odom.y
-        #z = self.vehicle_odom.z
+
         
         msg = TrajectorySetpoint() 
         msg.x = np.nan
         msg.y = np.nan
         msg.z = np.nan
-
-        msg.vx = v * ((t_x-x)/(math.sqrt(math.pow(t_x-x,2)+math.pow(t_y-y,2)+math.pow(t_z-z,2))))
-        msg.vy = v * ((t_y-y)/(math.sqrt(math.pow(t_x-x,2)+math.pow(t_y-y,2)+math.pow(t_z-z,2))))
-        msg.vz = v * ((t_z-z)/(math.sqrt(math.pow(t_x-x,2)+math.pow(t_y-y,2)+math.pow(t_z-z,2))))
+        
+        if(t_x==x and t_y == y and t_z==z):
+            msg.vx = float(0)
+            msg.vy = float(0)
+            msg.vz = float(0)
+        else:
+            msg.vx = v * ((t_x-x)/(math.sqrt(math.pow(t_x-x,2)+math.pow(t_y-y,2)+math.pow(t_z-z,2))))
+            msg.vy = v * ((t_y-y)/(math.sqrt(math.pow(t_x-x,2)+math.pow(t_y-y,2)+math.pow(t_z-z,2))))
+            msg.vz = v * ((t_z-z)/(math.sqrt(math.pow(t_x-x,2)+math.pow(t_y-y,2)+math.pow(t_z-z,2))))
     
         diff_x = t_x-x
         diff_y = t_y-y
@@ -237,11 +235,6 @@ class OffboardControl(Node):
 
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
-        #self.get_logger().info(f"Controlled by velocity..")
-        #self.get_logger().info(f"Publishing position setpoints {[t_x, t_y, t_z]}")
-        #self.get_logger().info(f"intended vx vy vz {[msg.vx, msg.vy, msg.vz]}")
-        #self.get_logger().info(f"odom x y z {[self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]}")
-        #self.get_logger().info(f"odom vx vy vz {[self.vehicle_odom.vx, self.vehicle_odom.vy, self.vehicle_odom.vz]}")
 
     def compensation_path_with_odom(self):
         self.previous_waypoint[0] = self.vehicle_odom.x
@@ -290,9 +283,9 @@ class OffboardControl(Node):
             self.setpoint_mode = True
             self.wait_in_waypoint += 1
             if (self.wait_in_waypoint == 20):
-                self.previous_waypoint[0] = self.waypoint_list[self.waypoint_count][0]
-                self.previous_waypoint[1] = self.waypoint_list[self.waypoint_count][1]
-                self.previous_waypoint[2] = self.waypoint_list[self.waypoint_count][2]
+                self.previous_waypoint[0] = self.vehicle_odom.x
+                self.previous_waypoint[1] = self.vehicle_odom.y
+                self.previous_waypoint[2] = self.vehicle_odom.z
 
                 self.get_logger().info(f"{[to_x, to_y, to_z]}, departed !! ")
 
@@ -331,10 +324,34 @@ class OffboardControl(Node):
         self.trajectory_setpoint_publisher.publish(msg)
 
     def mission_check(self):
-        pass
+        if (self.waypoint_count == 2 or self.waypoint_count == 3 or self.waypoint_count==5):
+            self.is_mission_ladder += 1
 
     def mission_ladder(self):
-        pass
+
+        if(self.is_mission_started == 1):
+            se1 = SE()
+            se1.obstacle(self.real_obstacle_list)
+            self.get_logger().info(f" {[self.waypoint_list[self.waypoint_count][0], self.waypoint_list[self.waypoint_count][1], self.waypoint_list[self.waypoint_count][2]]}로 가기 위한 SE 알고리즘 경로를 생성합니다. ")
+            self.waypoint_for_ladder = se1.make_final_path(self.waypoint_list[self.waypoint_count-1][0], self.waypoint_list[self.waypoint_count-1][1], self.waypoint_list[self.waypoint_count][0], self.waypoint_list[self.waypoint_count][1])
+   
+            for i in self.waypoint_for_ladder:
+                i.append(self.waypoint_list[self.waypoint_count][2])
+            self.is_mission_started = 0
+
+
+        self.goto_waypoint(self.waypoint_for_ladder[self.ladder_mission_count][0], self.waypoint_for_ladder[self.ladder_mission_count][1], self.waypoint_for_ladder[self.ladder_mission_count][2], 
+                           self.waypoint_velocity[self.waypoint_count], 1)
+
+        if(self.is_departed == 1):
+            self.ladder_mission_count += 1
+            self.is_departed = 0
+
+        if(self.ladder_mission_count == len(self.waypoint_for_ladder)):
+            self.is_mission_started = 0
+            self.ladder_mission_count = 0
+            self.is_mission_ladder_finished = 1
+
     
     def mission_delivery(self):
         pass
@@ -353,12 +370,16 @@ class OffboardControl(Node):
             self.engage_offboard_mode()
             self.arm()
         
-        self.mission_check
+        if(self.is_mission_ladder == 1 and self.waypoint_count == 2 and self.is_mission_ladder_finished == 0):
+            self.mission_ladder()
+        
+        elif(self.is_mission_ladder == 2 and self.waypoint_count == 3 and self.is_mission_ladder_finished == 0):
+            self.mission_ladder()
+        
+        elif(self.is_mission_ladder == 3 and self.waypoint_count == 5 and self.is_mission_ladder_finished == 0):
+            self.mission_ladder()
 
-        if(self.mission_ladder == 1):
-            pass
-
-        elif(self.mission_delivery == 1):
+        elif(self.is_mission_delivery == 1):
             pass
         
         #elif(self.waypoint_count == 3 and self.circle_path == 1): # 몇 번째 waypoint를 중심으로 돌고 싶은지
@@ -370,9 +391,12 @@ class OffboardControl(Node):
         else:
             self.goto_waypoint(x, y, z, v, yaw)
        
-            if(self.is_departed == 1 and (self.waypoint_count < self.waypoint_num)): # next waypoint update
-                self.waypoint_count +=1
-                self.is_departed = 0
+        if(self.is_departed == 1 and (self.waypoint_count < self.waypoint_num)): # next waypoint update
+            self.waypoint_count +=1
+            self.is_mission_ladder_finished = 0
+            self.is_mission_started = 1
+            self.is_departed = 0
+            self.mission_check()
         
         self.offboard_setpoint_counter += 1
        

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 ############################################################################
-#
+#   version 230707 1530
 #   Copyright (C) 2023 SOAR-Snowr1d. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -79,10 +79,10 @@ class OffboardControl(Node):
         self.vehicle_odom = VehicleOdometry()
 
         self.waypoint_contest = [[0,0,-2], [70, 30, -2], [140, 100, -2]]
-        self.waypoint_list = [[0,0,-2], [6,0,-2], [-6,0,-2], [6,0,-2], [9,4,-2], [6, 0, -2], [6, 0, 0]]
-        #                      way1     mission1     way2     mission2     way3        way1       landing
-        self.waypoint_velocity = [2, 0.8, 0.8, 0.8, 0.8, 0.8, 2]
-        self.waypoint_yaw = [0, 1, 1, 1, 1, 1, 0]
+        self.waypoint_list = [[0,0,-2], [6,0,-2], [-6,0,-2], [6,0,-2], [9,4,-2], [6, 0, -2], [5, 0, -2], [6, 0, 0]]
+        #                      way1     mission1     way2     mission2     way3        way1     missoin3     landing
+        self.waypoint_velocity = [2, 5, 5, 5, 5, 5, 5, 2]
+        self.waypoint_yaw = [0, 1, 1, 1, 1, 1, 1, 0]
         self.waypoint_num = len(self.waypoint_list)
         self.waypoint_count = 0
         self.waypoint_range = 0.4
@@ -95,6 +95,8 @@ class OffboardControl(Node):
         self.is_go_to_center = 0
         self.stable_counter = 0
         self.stable_odom = [0, 0, 0]
+
+        self.wait_time = 0
     
         self.is_new_go = 0
         self.is_departed = 0
@@ -106,8 +108,9 @@ class OffboardControl(Node):
         self.is_mission_started = 0
         self.ladder_mission_count = 0
         self.is_ladder_mission_finished = 0
+        self.is_ladder_detected = 0
 
-        self.real_obstacle_list = [[0, 0, 1]]
+        self.real_obstacle_list = [[72.5, 32.5, 1.5], [67.5, 27.5, 1.5]]
         self.waypoint_for_ladder = []
         
         self.theta = 0
@@ -177,9 +180,9 @@ class OffboardControl(Node):
         y = self.previous_waypoint[1]
         
         msg = TrajectorySetpoint()
-        msg.x = t_x
-        msg.y = t_y
-        msg.z = t_z
+        msg.x = float(t_x)
+        msg.y = float(t_y)
+        msg.z = float(t_z)
         msg.yaw = float(self.previous_yaw)
  
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
@@ -315,20 +318,20 @@ class OffboardControl(Node):
         diff_y = self.vehicle_odom.y - t_y
         if(math.sqrt(pow(diff_x,2)+pow(diff_y,2)) > (radius+1)):
             if(self.is_go_to_center==0):
-                self.get_logger().info(f" going to central point of circle ")
+                #self.get_logger().info(f" going to central point of circle ")
                 self.is_go_to_center = 1
             self.goto_waypoint(t_x, t_y, t_z, self.waypoint_velocity[self.waypoint_count], 1)
             return
         self.publish_offboard_control_heartbeat_signal(True)
         if(self.initial_theta ==-1):
             self.get_logger().info(f" {[t_x, t_y, t_z]} circle path with r{radius} ")
-            self.theta = math.atan(diff_y, diff_x)
+            self.theta = math.atan2(diff_y, diff_x)
           
             self.initial_theta = self.theta
-        msg.x = t_x+radius * np.cos(self.theta)
-        msg.y = t_y+radius * np.sin(self.theta)
-        msg.z = t_z
-        msg.yaw = self.theta + w * self.dt + math.pi # (90 degree)
+        msg.x = float(t_x+radius * np.cos(self.theta))
+        msg.y = float(t_y+radius * np.sin(self.theta))
+        msg.z = float(t_z)
+        msg.yaw = float(self.theta + w * self.dt + math.pi) # (90 degree)
         self.theta = self.theta + w * self.dt
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
@@ -340,11 +343,9 @@ class OffboardControl(Node):
     def mission_ladder(self):
 
         if(self.is_mission_started == 1):
-            se1 = SE()
-            se1.obstacle(self.real_obstacle_list)
+            se1 = SE(self.real_obstacle_list)
             self.get_logger().info(f" {[self.waypoint_list[self.waypoint_count][0], self.waypoint_list[self.waypoint_count][1], self.waypoint_list[self.waypoint_count][2]]}로 가기 위한 SE 알고리즘 경로를 생성합니다. ")
             self.waypoint_for_ladder = se1.make_final_path(self.waypoint_list[self.waypoint_count-1][0], self.waypoint_list[self.waypoint_count-1][1], self.waypoint_list[self.waypoint_count][0], self.waypoint_list[self.waypoint_count][1])
-   
             for i in self.waypoint_for_ladder:
                 i.append(self.waypoint_list[self.waypoint_count][2])
             self.is_mission_started = 0
@@ -362,17 +363,38 @@ class OffboardControl(Node):
             self.ladder_mission_count = 0
             self.is_mission_ladder_finished = 1
     
-    def make_points_for_contest(self, waypoint_1, waypoint_2, waypoint_3):
+    def make_points_for_contest(self, waypoint_1, waypoint_2, waypoint_3): 
         distance_w1_w2 = math.sqrt(pow(waypoint_1[0]-waypoint_2[0],2)+pow(waypoint_1[1]-waypoint_2[1],2)+pow(waypoint_1[2]-waypoint_2[2], 2))
         distance_w2_w3 = math.sqrt(pow(waypoint_2[0]-waypoint_3[0],2)+pow(waypoint_2[1]-waypoint_3[1],2)+pow(waypoint_2[2]-waypoint_3[2], 2))
         mission_point_1 = [waypoint_2[0]-(8.5*((waypoint_2[0]-waypoint_1[0])/distance_w1_w2)), waypoint_2[1]-(8.5*((waypoint_2[1]-waypoint_1[1])/distance_w1_w2)), waypoint_1[2]]
         mission_point_2 = [waypoint_2[0]+(8.5*((waypoint_3[0]-waypoint_2[0])/distance_w2_w3)), waypoint_2[1]+(8.5*((waypoint_3[1]-waypoint_2[1])/distance_w2_w3)), waypoint_2[2]]
-        self.waypoint_list = [waypoint_1, mission_point_1, waypoint_2, mission_point_2, waypoint_3, waypoint_1, [waypoint_1[0], waypoint_1[1], 0]]
+        mission_point_3 = self.calculate_return_point(waypoint_2[0], waypoint_3[0], waypoint_2[1], waypoint_3[1])
+        mission_point_3.append(waypoint_1[2])
+        self.waypoint_list = [waypoint_1, mission_point_1, waypoint_2, mission_point_2, waypoint_3, mission_point_3, waypoint_1, [waypoint_1[0], waypoint_1[1], 0]]
         
 
+    def calculate_return_point(self, a, b, c, d): #a->x2, b->x3, c->y2, d->y3 
+        x = (a**3-2*(a**2)*b + a*(b**2+(c-d)**2)-15*math.sqrt(((a-b)**2) *(a**2-2*a*b+b**2+(c-d)**2)))/(a**2-2*a*b+b**2+(c-d)**2)
+        y = ((a**3)*c-3*(a**2)*b*c-(b**3)*c+a*c*(3*(b**2)+(c-d)**2)-15*math.sqrt(((a-b)**2)*(a**2-2*a*b+b**2+(c-d)**2))*(c-d)-b*c*(c-d)**2)/((a-b)*(a**2-2*a*b+b**2+(c-d)**2))
+        x2 = (a**3-2*(a**2)*b + a*(b**2+(c-d)**2)+15*math.sqrt(((a-b)**2) *(a**2-2*a*b+b**2+(c-d)**2)))/(a**2-2*a*b+b**2+(c-d)**2)
+        y2 = ((a**3)*c-3*(a**2)*b*c-(b**3)*c+a*c*(3*(b**2)+(c-d)**2)+15*math.sqrt(((a-b)**2)*(a**2-2*a*b+b**2+(c-d)**2))*(c-d)-b*c*(c-d)**2)/((a-b)*(a**2-2*a*b+b**2+(c-d)**2))
     
+        first_distance = pow(x-self.waypoint_list[0][0], 2)+pow(y-self.waypoint_list[0][1],2)
+        second_distance = pow(x2-self.waypoint_list[0][0], 2)+pow(y2-self.waypoint_list[0][1],2)
+        if(first_distance<second_distance):
+            return [x,y]
+        else:
+            return [x2, y2]
+        
     def mission_delivery(self):
         pass
+    
+    def ladder_detect_flight(self):
+        self.circle_path_publish(self.waypoint_contest[1][0], self.waypoint_contest[1][1], self.waypoint_contest[1][2], 0.07, 8.5)
+        if(self.theta-self.initial_theta > math.pi * 2):
+            self.circle_path =0
+            self.is_go_to_center = 0
+            self.is_ladder_detected = 1
         
 
     def timer_callback(self) -> None:
@@ -391,13 +413,32 @@ class OffboardControl(Node):
             self.make_points_for_contest(self.waypoint_contest[0], self.waypoint_contest[1], self.waypoint_contest[2])
         
         if(self.is_mission_ladder == 1 and self.waypoint_count == 2 and self.is_mission_ladder_finished == 0):
-            self.mission_ladder()
+            if(self.wait_time == 0):
+                self.wait_time = self.offboard_setpoint_counter
+
+            if(self.offboard_setpoint_counter-self.wait_time < 10 and self.is_ladder_detected == 0):
+                self.publish_offboard_control_heartbeat_signal(False)
+                self.stable_depart_publish(self.waypoint_list[self.waypoint_count-1][0], self.waypoint_list[self.waypoint_count-1][1], self.waypoint_list[self.waypoint_count-1][2], self.waypoint_velocity[self.waypoint_count-1], 0)
+                if (self.offboard_setpoint_counter == 9):
+                    self.wait_time = -1
+
+            elif(self.is_ladder_detected == 0):
+                self.ladder_detect_flight()
+                if(self.is_ladder_detected == 1):
+                    self.wait_time = self.offboard_setpoint_counter
+            elif(self.is_ladder_detected == 1 and self.wait_time != -2):
+                self.publish_offboard_control_heartbeat_signal(False)
+                self.stable_depart_publish(self.waypoint_list[self.waypoint_count-1][0], self.waypoint_list[self.waypoint_count-1][1], self.waypoint_list[self.waypoint_count-1][2], self.waypoint_velocity[self.waypoint_count-1], 0)
+                if(self.offboard_setpoint_counter - self.wait_time ==10):
+                    self.wait_time = -2
+            else:
+                self.mission_ladder()
         
         elif(self.is_mission_ladder == 2 and self.waypoint_count == 3 and self.is_mission_ladder_finished == 0):
             self.mission_ladder()
         
-        elif(self.is_mission_ladder == 3 and self.waypoint_count == 5 and self.is_mission_ladder_finished == 0):
-            self.mission_ladder()
+        #elif(self.is_mission_ladder == 3 and self.waypoint_count == 5 and self.is_mission_ladder_finished == 0):
+            #self.mission_ladder()
 
         elif(self.is_mission_delivery == 1):
             pass
@@ -406,7 +447,7 @@ class OffboardControl(Node):
         #    self.circle_path_publish(x, y, z, 0.2, 3)
         #    if (self.theta-self.initial_theta > math.pi *2 ): # 한바퀴 돌기
         #        self.circle_path = 0
-        #        self.waypoint_count += 1
+        #        self.waypoint_count += 1e
         #        self.is_go_to_center = 0
         else:
             self.goto_waypoint(x, y, z, v, yaw)

@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 class SE:
     def __init__(self):
-        self.obstacle_list = [[2.5, -2.5, 1], [-2.5, 2.5, 1]]
+        self.obstacle_list = [[2.5, -2.5, 1.5], [-2.5, 2.5, 1.5]]
         self.is_path_generated = False
     def obstacle(self, obstacle_list):
         self.obstacle_list = obstacle_list
@@ -18,10 +18,14 @@ class SE:
         distance_target = math.sqrt((t_x - now_x) ** 2 + (t_y - now_y) ** 2)
         collision_cost = 0
         for i in self.obstacle_list:
+            shortest_obstacle = (math.sqrt((i[0] - t_x) ** 2 + (i[1] - t_y) ** 2) - i[2])
             if ((math.sqrt((i[0] - t_x) ** 2 + (i[1] - t_y) ** 2) - i[2]) ==0):
                 collision_cost += 10000000
             else:
-                collision_cost += 1 / (((i[0] - t_x) ** 2 + (i[1] - t_y) ** 2) - i[2])
+                if(shortest_obstacle<1.5):
+                    collision_cost += (100 / pow((math.sqrt((i[0] - t_x) ** 2 + (i[1] - t_y) ** 2) - i[2]),6))
+            #if (math.sqrt(pow(i[0]-t_x,2)+pow(i[1]-t_y,2))-i[2] > 0.5):
+                #collision_cost += 100000
         return distance_target + collision_cost
 
     def make_random_point(self, now_x, now_y, t_x, t_y):
@@ -40,7 +44,7 @@ class SE:
         elif safe_radius < 2.5:
             generate_circle_num = 12
         elif safe_radius < 4:
-            generate_circle_num = 18
+            generate_circle_num = 15
         else:
             generate_circle_num = 30
 
@@ -87,7 +91,7 @@ class SE:
     def make_final_path(self, now_x, now_y, target_x, target_y):
         total_path_list = []
 
-        for _ in range(20):
+        for _ in range(30):
             path_list = []
             se1 = SE()
             se1.make_total_path(now_x, now_y, target_x, target_y, path_list)
@@ -104,7 +108,8 @@ class SE:
                 continue
             for j in range(len(i) - 1):
                 cost_path += for_cost_function.cost(i[j][0], i[j][1], i[j + 1][0], i[j + 1][1])
-            if cost_path < minimum_cost:
+            cost_path += 10*len(i)
+            if (cost_path < minimum_cost):
                 minimum_cost = cost_path
                 final_path = i
             cost_path = 0

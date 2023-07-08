@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 ############################################################################
-#   version 230707 1530
+#   version 230708 0440
 #   Copyright (C) 2023 SOAR-Snowr1d. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -79,10 +79,10 @@ class OffboardControl(Node):
         self.vehicle_odom = VehicleOdometry()
 
         self.waypoint_contest = [[0,0,-2], [70, 30, -2], [140, 100, -2]]
-        self.waypoint_list = [[0,0,-2], [6,0,-2], [-6,0,-2], [6,0,-2], [9,4,-2], [6, 0, -2], [5, 0, -2], [6, 0, 0]]
-        #                      way1     mission1     way2     mission2     way3        way1     missoin3     landing
-        self.waypoint_velocity = [2, 5, 5, 5, 5, 5, 5, 2]
-        self.waypoint_yaw = [0, 1, 1, 1, 1, 1, 1, 0]
+        self.waypoint_list = [[0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, 0]]
+        #                      way1     mission1     way2   mission2    way3     mission2      way2       mission1      way1      landing
+        self.waypoint_velocity = [2, 5, 5, 5, 5, 5, 5, 5, 5, 2]
+        self.waypoint_yaw = [0, 1, 1, 1, 1, 1, 1, 1, 1, 0]
         self.waypoint_num = len(self.waypoint_list)
         self.waypoint_count = 0
         self.waypoint_range = 0.4
@@ -337,7 +337,7 @@ class OffboardControl(Node):
         self.trajectory_setpoint_publisher.publish(msg)
 
     def mission_check(self):
-        if (self.waypoint_count == 2 or self.waypoint_count == 3 or self.waypoint_count==5):
+        if (self.waypoint_count == 2 or self.waypoint_count == 3 or self.waypoint_count==6 or self.waypoint_count == 7):
             self.is_mission_ladder += 1
 
     def mission_ladder(self):
@@ -368,23 +368,8 @@ class OffboardControl(Node):
         distance_w2_w3 = math.sqrt(pow(waypoint_2[0]-waypoint_3[0],2)+pow(waypoint_2[1]-waypoint_3[1],2)+pow(waypoint_2[2]-waypoint_3[2], 2))
         mission_point_1 = [waypoint_2[0]-(8.5*((waypoint_2[0]-waypoint_1[0])/distance_w1_w2)), waypoint_2[1]-(8.5*((waypoint_2[1]-waypoint_1[1])/distance_w1_w2)), waypoint_1[2]]
         mission_point_2 = [waypoint_2[0]+(8.5*((waypoint_3[0]-waypoint_2[0])/distance_w2_w3)), waypoint_2[1]+(8.5*((waypoint_3[1]-waypoint_2[1])/distance_w2_w3)), waypoint_2[2]]
-        mission_point_3 = self.calculate_return_point(waypoint_2[0], waypoint_3[0], waypoint_2[1], waypoint_3[1])
-        mission_point_3.append(waypoint_1[2])
-        self.waypoint_list = [waypoint_1, mission_point_1, waypoint_2, mission_point_2, waypoint_3, mission_point_3, waypoint_1, [waypoint_1[0], waypoint_1[1], 0]]
-        
-
-    def calculate_return_point(self, a, b, c, d): #a->x2, b->x3, c->y2, d->y3 
-        x = (a**3-2*(a**2)*b + a*(b**2+(c-d)**2)-15*math.sqrt(((a-b)**2) *(a**2-2*a*b+b**2+(c-d)**2)))/(a**2-2*a*b+b**2+(c-d)**2)
-        y = ((a**3)*c-3*(a**2)*b*c-(b**3)*c+a*c*(3*(b**2)+(c-d)**2)-15*math.sqrt(((a-b)**2)*(a**2-2*a*b+b**2+(c-d)**2))*(c-d)-b*c*(c-d)**2)/((a-b)*(a**2-2*a*b+b**2+(c-d)**2))
-        x2 = (a**3-2*(a**2)*b + a*(b**2+(c-d)**2)+15*math.sqrt(((a-b)**2) *(a**2-2*a*b+b**2+(c-d)**2)))/(a**2-2*a*b+b**2+(c-d)**2)
-        y2 = ((a**3)*c-3*(a**2)*b*c-(b**3)*c+a*c*(3*(b**2)+(c-d)**2)+15*math.sqrt(((a-b)**2)*(a**2-2*a*b+b**2+(c-d)**2))*(c-d)-b*c*(c-d)**2)/((a-b)*(a**2-2*a*b+b**2+(c-d)**2))
-    
-        first_distance = pow(x-self.waypoint_list[0][0], 2)+pow(y-self.waypoint_list[0][1],2)
-        second_distance = pow(x2-self.waypoint_list[0][0], 2)+pow(y2-self.waypoint_list[0][1],2)
-        if(first_distance<second_distance):
-            return [x,y]
-        else:
-            return [x2, y2]
+        self.waypoint_list = [waypoint_1, mission_point_1, waypoint_2, mission_point_2, waypoint_3, mission_point_2, waypoint_2, mission_point_1, waypoint_1,  [waypoint_1[0], waypoint_1[1], 0]]
+                            #   0                1            2             3               4            5               6              7             8                    9
         
     def mission_delivery(self):
         pass
@@ -436,19 +421,16 @@ class OffboardControl(Node):
         
         elif(self.is_mission_ladder == 2 and self.waypoint_count == 3 and self.is_mission_ladder_finished == 0):
             self.mission_ladder()
+
+        elif(self.is_mission_ladder == 3 and self.waypoint_count == 6 and self.is_mission_ladder_finished == 0):
+            self.mission_ladder()
         
-        #elif(self.is_mission_ladder == 3 and self.waypoint_count == 5 and self.is_mission_ladder_finished == 0):
-            #self.mission_ladder()
+        elif(self.is_mission_ladder == 4 and self.waypoint_count == 7 and self.is_mission_ladder_finished == 0):
+            self.mission_ladder()
 
         elif(self.is_mission_delivery == 1):
             pass
         
-        #elif(self.waypoint_count == 3 and self.circle_path == 1): # 몇 번째 waypoint를 중심으로 돌고 싶은지
-        #    self.circle_path_publish(x, y, z, 0.2, 3)
-        #    if (self.theta-self.initial_theta > math.pi *2 ): # 한바퀴 돌기
-        #        self.circle_path = 0
-        #        self.waypoint_count += 1e
-        #        self.is_go_to_center = 0
         else:
             self.goto_waypoint(x, y, z, v, yaw)
        
@@ -478,3 +460,5 @@ if __name__ == '__main__':
         main()
     except Exception as e:
         print(e)
+
+

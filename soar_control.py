@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 ############################################################################
-#   version 230708 0440
+#   version 230708 2035
 #   Copyright (C) 2023 SOAR-Snowr1d. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,14 @@ from px4_msgs.msg import OffboardControlMode, TrajectorySetpoint, VehicleCommand
 import math
 import numpy as np
 
+def euler_from_quaternion(w, x, y, z):
+    t0 = +2 * (w*x+y*z)
+    t1 = +1 - 2*(x*x+y*y)
+    t3 = +2*(w*z+x*y)
+    t4 = +1-2*(y*y+z*z)
+    yaw_z = math.atan2(t3, t4)
+    return yaw_z
+
 
 class OffboardControl(Node):
     """Node for controlling a vehicle in offboard mode."""
@@ -79,10 +87,10 @@ class OffboardControl(Node):
         self.vehicle_odom = VehicleOdometry()
 
         self.waypoint_contest = [[0,0,-2], [70, 30, -2], [140, 100, -2]]
-        self.waypoint_list = [[0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, 0]]
-        #                      way1     mission1     way2   mission2    way3     mission2      way2       mission1      way1      landing
-        self.waypoint_velocity = [2, 5, 5, 5, 5, 5, 5, 5, 5, 2]
-        self.waypoint_yaw = [0, 1, 1, 1, 1, 1, 1, 1, 1, 0]
+        self.waypoint_list = [[0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, 0]]
+        #                      way1     mission1     way2   mission2    way3     way3      mission2      way2       mission1      way1      landing
+        self.waypoint_velocity = [2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2]
+        self.waypoint_yaw = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
         self.waypoint_num = len(self.waypoint_list)
         self.waypoint_count = 0
         self.waypoint_range = 0.4
@@ -95,6 +103,7 @@ class OffboardControl(Node):
         self.is_go_to_center = 0
         self.stable_counter = 0
         self.stable_odom = [0, 0, 0]
+        self.is_go_to_circle_point = 0
 
         self.wait_time = 0
     
@@ -116,6 +125,20 @@ class OffboardControl(Node):
         self.theta = 0
         self.initial_theta = -1
         self.circle_path = 1
+
+        #variables for delivery
+        self.is_mission_delivery = 0
+        self.is_crossbow_detected = 0
+        self.crossbow_location = [144, 105, -8]
+        self.crossbow_location_confirmed = [144, 105, -8]
+        self.balcony_location = [143,106, -7]
+        self.is_delivery_started = 0
+        self.theta_yaw = 0
+        self.crossbow_showed_list = [] #이중 리스트
+        self.crossbow_start_point = [149, 106, -7]
+        self.is_delivery_going = 0
+        self.pizza_closed_point_distance = 0
+        self.wait_in_deliverypoint = 0
 
         # Create a timer to publish control commands
         self.dt = 0.1
@@ -173,6 +196,18 @@ class OffboardControl(Node):
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.offboard_control_mode_publisher.publish(msg)
 
+    def publish_yaw_with_hovering(self, x:float, y:float, z:float, v:float, yaw:float):
+        msg = TrajectorySetpoint()
+        self.publish_offboard_control_heartbeat_signal(True)
+        msg.x = float(x)
+        msg.y = float(y)
+        msg.z = float(z)
+        msg.yaw = float(yaw)
+
+        msg.timestamp = int(self.get_clock().now().nanoseconds/1000)
+        self.trajectory_setpoint_publisher.publish(msg)
+
+
 
     def publish_position_setpoint(self, t_x: float, t_y: float, t_z: float, v:float, yaw:float):
         """Publish the trajectory setpoint."""
@@ -190,6 +225,7 @@ class OffboardControl(Node):
 
 
     def stable_depart_publish(self, t_x: float, t_y : float, t_z : float, v:float, yaw:float):
+        self.publish_offboard_control_heartbeat_signal(False)
         pi = math.pi
         self.previous_waypoint[0] = self.vehicle_odom.x
         self.previous_waypoint[1] = self.vehicle_odom.y
@@ -316,17 +352,22 @@ class OffboardControl(Node):
         pi = math.pi
         diff_x = self.vehicle_odom.x - t_x
         diff_y = self.vehicle_odom.y - t_y
-        if(math.sqrt(pow(diff_x,2)+pow(diff_y,2)) > (radius+1)):
+        if(math.sqrt(pow(diff_x,2)+pow(diff_y,2)) > (radius+0.5)):
             if(self.is_go_to_center==0):
                 #self.get_logger().info(f" going to central point of circle ")
                 self.is_go_to_center = 1
-            self.goto_waypoint(t_x, t_y, t_z, self.waypoint_velocity[self.waypoint_count], 1)
+                self.initial_theta2 = math.atan2(diff_y, diff_x)
+            self.goto_waypoint(t_x+math.cos(self.initial_theta2)*radius, t_y+math.sin(self.initial_theta2)*radius, t_z, self.waypoint_velocity[self.waypoint_count], 1)
+            return
+        elif(math.sqrt(pow(diff_x,2)+pow(diff_y,2)) < (radius-0.5)):
+            if(self.is_go_to_circle_point==0):
+                self.initial_theta2 = math.atan2(diff_y, diff_x)
+            self.goto_waypoint(t_x+math.cos(self.initial_theta2) * radius, t_y+math.sin(self.initial_theta2)*radius, t_z, self.waypoint_velocity[self.waypoint_count], 1)
             return
         self.publish_offboard_control_heartbeat_signal(True)
         if(self.initial_theta ==-1):
             self.get_logger().info(f" {[t_x, t_y, t_z]} circle path with r{radius} ")
             self.theta = math.atan2(diff_y, diff_x)
-          
             self.initial_theta = self.theta
         msg.x = float(t_x+radius * np.cos(self.theta))
         msg.y = float(t_y+radius * np.sin(self.theta))
@@ -337,8 +378,10 @@ class OffboardControl(Node):
         self.trajectory_setpoint_publisher.publish(msg)
 
     def mission_check(self):
-        if (self.waypoint_count == 2 or self.waypoint_count == 3 or self.waypoint_count==6 or self.waypoint_count == 7):
+        if (self.waypoint_count == 2 or self.waypoint_count == 3 or self.waypoint_count==7 or self.waypoint_count == 8):
             self.is_mission_ladder += 1
+        if (self.waypoint_count == 5 and self.is_mission_delivery==0):
+            self.is_mission_delivery = 1
 
     def mission_ladder(self):
 
@@ -368,18 +411,88 @@ class OffboardControl(Node):
         distance_w2_w3 = math.sqrt(pow(waypoint_2[0]-waypoint_3[0],2)+pow(waypoint_2[1]-waypoint_3[1],2)+pow(waypoint_2[2]-waypoint_3[2], 2))
         mission_point_1 = [waypoint_2[0]-(8.5*((waypoint_2[0]-waypoint_1[0])/distance_w1_w2)), waypoint_2[1]-(8.5*((waypoint_2[1]-waypoint_1[1])/distance_w1_w2)), waypoint_1[2]]
         mission_point_2 = [waypoint_2[0]+(8.5*((waypoint_3[0]-waypoint_2[0])/distance_w2_w3)), waypoint_2[1]+(8.5*((waypoint_3[1]-waypoint_2[1])/distance_w2_w3)), waypoint_2[2]]
-        self.waypoint_list = [waypoint_1, mission_point_1, waypoint_2, mission_point_2, waypoint_3, mission_point_2, waypoint_2, mission_point_1, waypoint_1,  [waypoint_1[0], waypoint_1[1], 0]]
+        self.waypoint_list = [waypoint_1, mission_point_1, waypoint_2, mission_point_2, waypoint_3, waypoint_3, mission_point_2, waypoint_2, mission_point_1, waypoint_1,  [waypoint_1[0], waypoint_1[1], 0]]
                             #   0                1            2             3               4            5               6              7             8                    9
         
     def mission_delivery(self):
-        pass
+        delivery_velocity = 0.8
+        if(self.is_delivery_going == 0):
+            if(self.is_crossbow_detected == 0):
+                self.cross_bow_detect()
+                if(self.is_crossbow_detected == 1):
+                    self.get_logger().info(f" crossbow detected, ready to go delivery ")
+            else:
+                self.goto_waypoint(self.crossbow_start_point[0], self.crossbow_start_point[1], -7, self.waypoint_velocity[self.waypoint_count], 1)
+                if(self.is_departed == 1):
+                    self.is_delivery_going = 1
+                    self.wait_in_deliverypoint = self.offboard_setpoint_counter
+                    self.is_departed = 0
+        elif(self.is_delivery_going == 1):
+            yaw_to_crossbow = math.atan2(self.crossbow_location_confirmed[1]-self.crossbow_start_point[1], self.crossbow_location_confirmed[0]-self.crossbow_start_point[0])
+            self.publish_yaw_with_hovering(self.crossbow_start_point[0], self.crossbow_start_point[1], -7, self.waypoint_velocity[self.waypoint_count], yaw_to_crossbow)
+            if(self.offboard_setpoint_counter-self.wait_in_deliverypoint>20):
+                self.get_logger().info(f" pizza is going " )
+                self.is_delivery_going = 2
+        elif(self.is_delivery_going == 2):
+            # to crossbow
+            if(self.pizza_closed_point_distance==0):
+                self.pizza_closed_point_distance = math.sqrt(pow(self.crossbow_location_confirmed[0]-self.crossbow_start_point[0],2)+pow(self.crossbow_location_confirmed[1]-self.crossbow_start_point[1],2))
+            d = self.pizza_closed_point_distance
+            self.goto_waypoint(self.crossbow_location_confirmed[0]+(3/d)*(self.crossbow_start_point[0]-self.crossbow_location_confirmed[0]), self.crossbow_location_confirmed[1]+(3/d)*(self.crossbow_start_point[1]-self.crossbow_location_confirmed[1]), self.crossbow_location_confirmed[2], delivery_velocity, 1)
+            if(self.is_departed == 1):
+                self.is_delivery_going = 3
+                self.is_departed = 0
+        elif(self.is_delivery_going == 3):
+            self.get_logger().info(f" delivery finished ")
+            self.is_mission_delivery = -1
     
+    def cross_bow_detect(self):
+        w = 0.01
+        if (self.is_delivery_started == 0):
+            #self.goto_waypoint(self.waypoint_contest[2][0], self.waypoint_contest[2][1], -7, 1, 0)
+            self.goto_waypoint(self.waypoint_contest[2][0],self.waypoint_contest[2][1],-7,1,0)
+            if(self.is_departed == 1):
+                self.is_departed = 0
+                self.is_delivery_started = -1
+        elif (self.is_delivery_started < 0):
+            if(self.is_delivery_started == -1):
+                self.theta_yaw = euler_from_quaternion(self.vehicle_odom.q[0], self.vehicle_odom.q[1], self.vehicle_odom.q[2], self.vehicle_odom.q[3])
+            self.theta_yaw += w
+  
+            self.publish_yaw_with_hovering(self.waypoint_contest[2][0], self.waypoint_contest[2][1], -7, 1, self.theta_yaw)
+            self.is_delivery_started += -1
+            if(self.is_delivery_started < -(2*math.pi/w)):
+                self.get_logger().info(f" balcony detected ")
+                self.is_delivery_started = 1
+            #(balcony 가장 가까운 위치 정보 subsribe)
+            # self.balcony_location에 balcony 위치 저장
+        else :
+            #print(1)
+            self.circle_path_publish(self.balcony_location[0], self.balcony_location[1], -7, 0.1, 6)
+            '''
+            십자가 detected 정보 subscribe,
+            if(십자가 detected):
+                self.crossbow_showed_list.append([self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]) 
+             
+            ''' 
+            if (self.theta-self.initial_theta > math.pi *2 ): # 한바퀴 돌기
+                self.circle_path = 0
+                self.is_go_to_center = 0
+                self.is_go_to_circle_point = 0
+                self.is_crossbow_detected = 1        
+                # for(i in self.crossbow_showed_list)
+                    #self.crossbow_start_point[0] += i[0]
+                    #self.crossbow_start_point[1] += i[1]
+                # self.crossbow_start_point[0] = self.crossbow_start_point[0]/len(self.crossbow_showed_list)
+                # self.crossbow_start_point[1] = self.crossbow_start_ponit[1]/len(self.crossbow_showed_list)
+
     def ladder_detect_flight(self):
         self.circle_path_publish(self.waypoint_contest[1][0], self.waypoint_contest[1][1], self.waypoint_contest[1][2], 0.07, 8.5)
         if(self.theta-self.initial_theta > math.pi * 2):
             self.circle_path =0
             self.is_go_to_center = 0
             self.is_ladder_detected = 1
+            self.initial_theta = -1
         
 
     def timer_callback(self) -> None:
@@ -422,14 +535,15 @@ class OffboardControl(Node):
         elif(self.is_mission_ladder == 2 and self.waypoint_count == 3 and self.is_mission_ladder_finished == 0):
             self.mission_ladder()
 
-        elif(self.is_mission_ladder == 3 and self.waypoint_count == 6 and self.is_mission_ladder_finished == 0):
+        elif(self.is_mission_ladder == 3 and self.waypoint_count == 7 and self.is_mission_ladder_finished == 0):
             self.mission_ladder()
         
-        elif(self.is_mission_ladder == 4 and self.waypoint_count == 7 and self.is_mission_ladder_finished == 0):
+        elif(self.is_mission_ladder == 4 and self.waypoint_count == 8 and self.is_mission_ladder_finished == 0):
             self.mission_ladder()
 
         elif(self.is_mission_delivery == 1):
-            pass
+            self.mission_delivery()
+            self.is_departed = 0
         
         else:
             self.goto_waypoint(x, y, z, v, yaw)
@@ -460,5 +574,4 @@ if __name__ == '__main__':
         main()
     except Exception as e:
         print(e)
-
 

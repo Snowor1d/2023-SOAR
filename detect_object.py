@@ -15,16 +15,28 @@ from sklearn.cluster import KMeans
 import random
 import time
 
+# Configure QoS profile for publishing and subscribing
+
+
 
 
 class detect_ladder(Node):
-    def __init__(self):
-         self.grid_cells_subscriber = self.create_subscription(
-            GridCells, 'map_talker/grid_cells', self.PCL_callback)
-         self.point_list = []
-         self.ladder_list_guess = []
+    def __init__(self) ->None:
 
-
+        super().__init__('detect_ladder')
+        
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1
+        )
+        
+        self.grid_cells_subscriber = self.create_subscription(
+            GridCells, 'map_talker/grid_cells', self.PCL_callback, qos_profile)
+        self.point_list = []
+        self.ladder_list_guess = []
+        
     def PCL_callback(self, msg):
         for i in msg.Cells:
             distance = math.sqrt(pow(i.x*0,2, 2)+pow(i.y*0.2,2))
@@ -39,13 +51,20 @@ class detect_ladder(Node):
         return self.ladder_list_guess      
 
 class detect_balcony(Node):
-    def __init__(self):
-         self.grid_cells_subscriber = self.create_subscription(
-            GridCells, 'map_talker/grid_cells', self.PCL_callback)
-         self.balcony_list =[]
-         self.balcony_confirmed_x = 0
-         self.balcony_confirmed_y = 0
-    def PCL_callback(self, msg):
+    def __init__(self) -> None:
+        super().__init__('detect_balcony')
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1
+        )
+        self.grid_cells_subscriber2 = self.create_subscription(
+            GridCells, 'map_talker/grid_cells', self.PCL_callback2, qos_profile)
+        self.balcony_list =[]
+        self.balcony_confirmed_x = 0
+        self.balcony_confirmed_y = 0
+    def PCL_callback2(self, msg):
         for i in msg.Cells:
             self.balcony_list.append([i.x, i.y])
         for j in self.balcony_list:
@@ -57,10 +76,16 @@ class detect_balcony(Node):
         return [self.balcony_confirmed_x, self.balcony_confirmed_y]
     
 class detect_crossbow(Node):
-
-    def __init__(self):
+    def __init__(self) -> None:
+        super().__init__('detect_crossbow')
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1
+        )
         self.cross_location_subscriber = self.create_subscription(
-            Point, 'gazebo_s2s_result', self.cross_callback)
+            Point, 'gazebo_s2s_result', self.cross_callback, qos_profile)
         self.cross_location = [0, 0, 0]
 
     def cross_callback(self, msg):
@@ -71,23 +96,6 @@ class detect_crossbow(Node):
         
 
 
-        num_l = [[1,2], [2,3], [4,5], [2.4, 1.2], [1.2, 3.4], [100, 101]]
-num = []
-for k in range(100):
-    if k%2==0:
-        num.append([random.randrange(1,100), random.randrange(1,100)])
-    else :
-        num.append([random.randrange(200, 300), random.randrange(200,300)])
-num = np.array(num)
-
-k_means1 =  KMeans(init="k-means++", n_clusters=2, n_init = 6)
-start = time.time()
-k_means1.fit(num)
-end = time.time()
-k_means_cluster_centers2 = k_means1.cluster_centers_
-
-print(k_means_cluster_centers2)
-print(end-start)
 
 
 

@@ -52,7 +52,7 @@ def euler_from_quaternion(w, x, y, z):
     yaw_z = math.atan2(t3, t4)
     return yaw_z
 
-def make_orth_points(x_1, y_1, x_2, y_2, r):
+def make_orth_points(x_1, y_1, x_2, y_2, r): ## 이게 뭘까????
     t_x1 = (x_1+x_2)/2 + math.cos(math.atan2(-x_2+x_1,y_2-y_1)) * r
     t_x2 = (x_1+x_2)/2 - math.cos(math.atan2(-x_2+x_1,y_2-y_1)) * r
     t_y1 =  (y_1+y_2)/2 + math.sin(math.atan2(-x_2+x_1,y_2-y_1)) * r
@@ -142,7 +142,7 @@ class OffboardControl(Node):
         self.is_ladder_mission_finished = 0
         self.is_ladder_detected = 0
 
-        self.real_ladder_list = [[0, 0, 1.5], [0, 0, 1.5]]
+        self.real_ladder_list = [[0, 0, 1.5], [0, 0, 1.5]] ## 이거 어떻게 아는 거지? (clustering 전에)
         self.waypoint_for_ladder = [] ## ladder 미션 시/ SE Algorithm을 통해 생성되는 point 저장 list 
     
         self.theta = 0
@@ -221,18 +221,18 @@ class OffboardControl(Node):
     def ladder_detect_on(self): # detect_object 임포트해서 clustering 평균 낸 사다리 두개 찾는 함수 
         ladder_sub = detect_ladder()
         guess_ladder = ladder_sub.r_ladder_location()[:]
-        ladder_sub.destroy_node()
+        ladder_sub.destroy_node() ##??
         if(len(guess_ladder) != 2): #ladder 정보가 2개가 아니다? 뭔가 이상한 상황. 서둘러 함수 빠져나와야 함 
             return
         ladder1_x = guess_ladder[0][0]
         ladder1_y = guess_ladder[0][1]
         ladder2_x = guess_ladder[1][0]
         ladder2_y = guess_ladder[1][1] # clustering 한 결과 ladder1, ladder2에 저장
-        distance = math.sqrt(math.pow(ladder1_x-ladder2_x,2)+math.pow(ladder1_y-ladder2_y,2))
-        distance_waypoint = math.sqrt(math.pow((ladder1_x+ladder2_x)/2 - self.waypoint_contest[1][0], 2)+math.pow((ladder1_y+ladder2_y)/2 -self.waypoint_contest[1][1], 2))
+        distance = math.sqrt(math.pow(ladder1_x-ladder2_x,2)+math.pow(ladder1_y-ladder2_y,2)) ## 두 사다리 사이 거리 (clustering으로 나온 사다리 좌표 기준)
+        distance_waypoint = math.sqrt(math.pow((ladder1_x+ladder2_x)/2 - self.waypoint_contest[1][0], 2)+math.pow((ladder1_y+ladder2_y)/2 -self.waypoint_contest[1][1], 2)) ## 실제 wpt 2와 계산한 wpt2와의 거리 차이
         
-        d1 = math.sqrt(math.pow(self.real_ladder_list[0][0]-ladder1_x,2)+math.pow(self.real_ladder_list[0][1]-ladder1_y,2))
-        d2 = math.sqrt(math.pow(self.real_ladder_list[1][0]-ladder1_x,2)+math.pow(self.real_ladder_list[1][1]-ladder1_y,2))
+        d1 = math.sqrt(math.pow(self.real_ladder_list[0][0]-ladder1_x,2)+math.pow(self.real_ladder_list[0][1]-ladder1_y,2)) ## 실제 사다리 1과 clustering으로 나온 사다리 1 사이 거리
+        d2 = math.sqrt(math.pow(self.real_ladder_list[1][0]-ladder1_x,2)+math.pow(self.real_ladder_list[1][1]-ladder1_y,2)) ## ''2
         if(d1>d2):
             temp_x = ladder1_x
             temp_y = ladder1_y
@@ -243,7 +243,7 @@ class OffboardControl(Node):
                                            # 부연설명 : 이거 갑자기 왜하냐??면 드론이 사다리를 돌면서 ladder1 정보는 ladder1끼리, ladder2 정보는 ladder2끼리 합쳐지고 평균이 내져야함. 근데 무엇이 ladder1이고 무엇이 ladder2 인지
                                            # 확신할 수 없잖아? 그래서 이미 추정중인 ladder1, ladder2의 위치를 보고 새로 들어온 ladder의 정보를 가까운데로 끼어 맞추는 거임 
 
-        if(distance<9 and distance>5 and distance_waypoint<2):
+        if(distance<9 and distance>5 and distance_waypoint<2): ## 여기 숫자 설정 기준이 뭐였을까 ??
             if(self.confirmed_ladder_num==0):
                 self.real_ladder_list[0][0] = ladder1_x
                 self.real_ladder_list[0][1] = ladder1_y
@@ -256,12 +256,14 @@ class OffboardControl(Node):
                 self.real_ladder_list[0][0] = (self.real_ladder_list[1][0]/self.confirmed_ladder_num) * (self.confirmed_ladder_num/(self.confirmed_ladder_num+1)) + ladder2_x/(self.confirmed_ladder_num+1)
                 self.real_ladder_list[0][0] = (self.real_ladder_list[1][1]/self.confirmed_ladder_num) * (self.confirmed_ladder_num/(self.confirmed_ladder_num+1)) + ladder2_y/(self.confirmed_ladder_num+1)
                 self.confirmed_ladder_num += 1
-                # ladder 좌표의 평균 내기. 새로 들어온 ladder의 정보, 원래 평균냈던 ladder의 정보, 이제 까지 평균내는데 사용했던 ladder 정보의 개수를 이용하면 새롭게 평균을 정의할 수 있겠지? 
+                # ladder 좌표의 평균 내기. 새로 들어온 ladder의 정보, 원래 평균냈던 ladder의 정보, 이제 까지 평균내는데 사용했던 ladder 정보의 개수를 이용하면 새롭게 평균을 정의할 수 있겠지?
+                ## ?? 교수님 이해가 안 됩니다
+
     def balcony_detect_on(self):
         balcony_sub = detect_balcony()
         guess_balcony = balcony_sub.r_balcony_location()[:]
         balcony_sub.destroy_node()
-        if(len(guess_balcony)== 0): # balcony 정보가 안들어왔었다면 서둘러 도망치기 
+        if(len(guess_balcony)== 0): # balcony 정보가 안들어왔었다면 서둘러 도망치기 ## 어디로??
             return 
         if(self.confirmed_balcony_num ==0): #만약 balcony 정보가 들어온게 없다면, 새롭게 정의
             self.confirmed_balcony_location[0] = guess_balcony[0]
@@ -270,10 +272,10 @@ class OffboardControl(Node):
         else:
             self.confirmed_balcony_location[0] = (self.confirmed_balcony_location[0]/self.confirmed_balcony_num) * (self.confirmed_balcony_num/(self.confirmed_balcony_num+1)) + guess_balcony[0]/(self.confirmed_ladder_num+1)
             self.confirmed_balcony_location[1] = (self.confirmed_balcony_location[1]/self.confirmed_balcony_num) * (self.confirmed_balcony_num/(self.confirmed_balcony_num+1)) + guess_balcony[1]/(self.confirmed_ladder_num+1)
-            self.confirmed_balcony_num += 1 #마찬가지로 balcony 좌표 평균 내기
+            self.confirmed_balcony_num += 1 #마찬가지로 balcony 좌표 평균 내기 ##??
 
     def cross_detect_on(self):
-        if(self.is_crossbow_detected == 0): #왜 self.is_crossbow_detected가 0일떄와 1일때를 구분했냐?? self.is_crossbow_detected가 0일 때 -> 드론이 십자가와 수직으로 정렬 위치를 아직 못찾은 상황, 1일 때는 정렬 위치를 찾은 상황임
+        if(self.is_crossbow_detected == 0): #왜 self.is_crossbow_detected가 0일 때와 1일 때를 구분했냐?? self.is_crossbow_detected가 0일 때 -> 드론이 십자가와 수직으로 정렬 위치를 아직 못찾은 상황, 1일 때는 정렬 위치를 찾은 상황임
                                             #내가 저번에 정렬 위치를 찾은 상황과 못찾은 상황에서 cross 정보를 다르게 저장할거라 했잖아? 정확도 이슈 때문에.. 그거 ㅇㅇ
             crossbow_sub = detect_crossbow()
             guess_crossbow = crossbow_sub.r_cross_location()[:]
@@ -574,7 +576,7 @@ class OffboardControl(Node):
         elif(self.is_delivery_going == 1):
             yaw_to_crossbow = math.atan2(self.crossbow_location_confirmed[1]-self.crossbow_start_point[1], self.crossbow_location_confirmed[0]-self.crossbow_start_point[0])
             self.publish_yaw_with_hovering(self.crossbow_start_point[0], self.crossbow_start_point[1], -7, self.waypoint_velocity[self.waypoint_count], yaw_to_crossbow)
-            if(self.offboard_setpoint_counter - self.wait_in_deliverypoint > 20):
+            if((self.offboard_setpoint_counter - self.wait_in_deliverypoint) > 20):
                 self.get_logger().info(f" pizza is going " )
                 self.is_delivery_going = 2
         elif(self.is_delivery_going == 2):
@@ -583,9 +585,10 @@ class OffboardControl(Node):
             if(self.pizza_closed_point_distance==0):
                 self.pizza_closed_point_distance = math.sqrt(pow(self.crossbow_location_confirmed[0]-self.crossbow_start_point[0],2)+pow(self.crossbow_location_confirmed[1]-self.crossbow_start_point[1],2))
             d = self.pizza_closed_point_distance
-            if(self.crossbow_location_confirmed[0]==0 and self.crossbow_location_confirmed[1]==0):
+            if(self.crossbow_location_confirmed[0]==0 and self.crossbow_location_confirmed[1]==0): ## 어떨 때 (0,0, ) 인 거지??? 안 보이면 그러나?
                 self.crossbow_location_confirmed = self.emergency_crossbow_location 
             self.goto_waypoint(self.crossbow_location_confirmed[0]+(3/d)*(self.crossbow_start_point[0]-self.crossbow_location_confirmed[0]), self.crossbow_location_confirmed[1]+(3/d)*(self.crossbow_start_point[1]-self.crossbow_location_confirmed[1]), self.crossbow_location_confirmed[2], delivery_velocity, 1)
+            ## ^^ 이거 뭘까??
             if(self.is_departed == 1):
                 self.is_delivery_going = 3
                 self.is_departed = 0
@@ -618,7 +621,7 @@ class OffboardControl(Node):
                 else:
                     self.get_logger().info(f" balcony detected ") ## detected? 
                     self.is_delivery_started = 1
-            #(balcony 가장 가까운 위치 정보 subsribe)
+            #(balcony 가장 가까운 위치 정보 subscribe)
             # self.balcony_location에 balcony 위치 저장
         else :
             #print(1)
@@ -645,7 +648,7 @@ class OffboardControl(Node):
                     self.crossbow_start_point[1] = self.crossbow_start_point[1]/crossbow_showed_list_num
                     self.crossbow_start_point[2] = self.crossbow_start_point[2]/crossbow_showed_list_num # 평균내서 정렬 위치 찾기 !!!
                 if(self.crossbow_start_point[0]==0 and self.crossbow_start_point[1]==0):
-                    self.get_logger().info(f" fail to find proper location to algin drone with crossbow. use emergency location ")
+                    self.get_logger().info(f" fail to find proper location to align drone with crossbow. use emergency location ")
                     self.crossbow_start_point = self.emergency_crossbow_started_location 
 
     def ladder_detect_flight(self):
@@ -700,7 +703,7 @@ class OffboardControl(Node):
             if(self.stayed_finished == 0):
                 self.stay_in_moment(self.waypoint_list[self.waypoint_count-1][0], self.waypoint_list[self.waypoint_count-1][1], self.waypoint_list[self.waypoint_count-1][2], self.waypoint_velocity[self.waypoint_count-1], 0)
             
-            elif(self.is_ladder_detected == 0): ##사다리 탐지가 안 되면
+            elif(self.is_ladder_detected == 0): ##사다리 탐지 전
                 self.ladder_detect_flight() ## 사다리 탐지 비행 (r8.5 원주비행)
                 if(self.is_ladder_detected == 1):
                     self.stayed_finished = 0

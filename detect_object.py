@@ -89,7 +89,7 @@ class detect_crossbow(Node):
         self.cross_location = [0, 0, 0]
 
     def cross_callback(self, msg):
-        self.cross_location = [msg.Point.x, msg.Point.y, msg.Point.z]
+        self.cross_location = [msg.x, msg.y, msg.z]
     
     def r_cross_location(self):
         return self.cross_location

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -* coding: utf-8 -*-
 ############################################################################
-#   version 230713 1824
+#   version 230714 1520
 #   Copyright (C) 2023 SOAR-Snowr1d. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -109,7 +109,7 @@ class OffboardControl(Node):
         self.vehicle_status = VehicleStatus()
         self.vehicle_odom = VehicleOdometry()
 
-        self.waypoint_contest = [[0,0,-2], [70, 30, -2], [140, 100, -2]] ##대회에서 주는 wpt 3개
+        self.waypoint_contest = [[0,0,-2], [70, 30, -2], [140, 100, -2]] ##대회에서 주는 wpt 3개 #태현킴 여기야~
         self.waypoint_list = [[0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, 0]] ## 코드 상 wpt들... ## 변환은 밑 함수에서 함
         #                      way1     mission1     way2   mission2    way3     way3      mission2      way2       mission1      way1      landing
         self.waypoint_velocity = [2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2]
@@ -142,7 +142,6 @@ class OffboardControl(Node):
         self.is_ladder_mission_finished = 0
         self.is_ladder_detected = 0
 
-        self.real_obstacle_list = [[72.5, 32.5, 1.5], [67.5, 27.5, 1.5]] ## wpt2 로부터 3.5m 떨어진 위치로 사다리 위치 설정한 임의의 값
         self.real_ladder_list = [[0, 0, 1.5], [0, 0, 1.5]]
         self.waypoint_for_ladder = [] ## ladder 미션 시/ SE Algorithm을 통해 생성되는 point 저장 list 
     
@@ -158,14 +157,13 @@ class OffboardControl(Node):
         #variables for delivery
         self.is_mission_delivery = 0
         self.is_crossbow_detected = 0
-        self.crossbow_location = [144, 105, -8] ## 드론의 배란다 원주 비행 시 처음 들어오는 + 위치 저장 ; NED 좌표계 상의 값이므로 변화 x ## 이게 필요하지는 않은 듯? junalee의 요청..
-        self.crossbow_location_confirmed = [144, 105, -8] ## crossbow_start_position에서 3m 간격 위치까지 이동하며 crossbow_location을 3개의 평균값으로 보정?? ## topic 세 번 발행 때마다 들어온 위치 값의 평균
-        self.balcony_location = [143,106, -7]
+        self.crossbow_location = [0, 0, -8] ## 드론의 배란다 원주 비행 시 처음 들어오는 + 위치 저장 ; NED 좌표계 상의 값이므로 변화 x ## 이게 필요하지는 않은 듯? junalee의 요청..
+        self.crossbow_location_confirmed = [0, 0, -8] ## crossbow_start_position에서 3m 간격 위치까지 이동하며 crossbow_location을 3개의 평균값으로 보정?? ## topic 세 번 발행 때마다 들어온 위치 값의 평균
 
         self.is_delivery_started = 0
         self.theta_yaw = 0
         self.crossbow_showed_list = [] #이중 리스트
-        self.crossbow_start_point = [149, 106, -7] ## ? ; 계산으로 얻는 것 아니었나? 어떻게 처음부터 알고 있을까 ##임의로 설정
+        self.crossbow_start_point = [0, 0, -7] ## ? ; 계산으로 얻는 것 아니었나? 어떻게 처음부터 알고 있을까 ##임의로 설정
         self.is_delivery_going = 0
         self.pizza_closed_point_distance = 0
         self.wait_in_deliverypoint = 0
@@ -177,6 +175,13 @@ class OffboardControl(Node):
         # Create a timer to publish control commands
         self.dt = 0.1
         self.timer = self.create_timer(self.dt, self.timer_callback)
+
+
+        # variables for emergency #태현킴 여기도~
+        self.emergency_ladder_location = [[67.5, 27.5, 1.5], [72.5, 32.5, 1.5]]
+        self.emergency_balcony_location = [146, 100, -8]
+        self.emergency_crossbow_started_location = [142, 100, -8]
+        self.emergency_crossbow_location = [147, 100, -8]
 
     def vehicle_odom_callback(self, vehicle_odom):
         self.vehicle_odom = vehicle_odom
@@ -273,7 +278,7 @@ class OffboardControl(Node):
             crossbow_sub = detect_crossbow()
             guess_crossbow = crossbow_sub.r_cross_location()[:]
             crossbow_sub.destroy_node()
-            if (len(crossbow_sub) == 0):
+            if (len(guess_crossbow) == 0):
                 return 0 #근데 갑자기 cross 정보가 사실 안들어왔었다면 서둘러 도망쳐야겠지?
             self.crossbow_location[0] = guess_crossbow[0]
             self.crossbow_location[1] = guess_crossbow[1]
@@ -281,7 +286,8 @@ class OffboardControl(Node):
 
         if(self.is_crossbow_detected == 1): # 정렬 위치 발견 -> 본격적으로 십자가 디텍팅
             crossbow_sub = detect_crossbow() 
-            guess_crossbow = crossbow_sub.r_cross_location()
+            guess_crossbow = crossbow_sub.r_cross_location()[:]
+            crossbow_sub.destroy_node()
             if(len(guess_crossbow)==0): 
                 return 0
             if(self.confirmed_crossbow_num == 0):
@@ -514,8 +520,8 @@ class OffboardControl(Node):
     def mission_ladder(self):
 
         if(self.is_mission_started == 1): ## (wpt 도착 후 다음 wpt로 갈 때 == is_mission_started)
-            se1 = SE(self.real_obstacle_list) ## 장애물 정보를 SE 알고리즘 돌려서 list 추가
-            self.sub_positions = make_orth_points(self.real_obstacle_list[0][0], self.real_obstacle_list[0][1], self.real_obstacle_list[1][0], self.real_obstacle_list[1][1], 2)
+            se1 = SE(self.real_ladder_list) ## 장애물 정보를 SE 알고리즘 돌려서 list 추가
+            self.sub_positions = make_orth_points(self.real_ladder_list[0][0], self.real_ladder_list[0][1], self.real_ladder_list[1][0], self.real_ladder_list[1][1], 2)
             arrange_shortest_point(self.waypoint_list[self.waypoint_count-1][0], self.waypoint_list[self.waypoint_count-1][1], self.sub_positions)
             self.get_logger().info(f" {[self.waypoint_list[self.waypoint_count][0], self.waypoint_list[self.waypoint_count][1], self.waypoint_list[self.waypoint_count][2]]}로 가기 위한 SE 알고리즘 경로를 생성합니다. ")
             
@@ -577,6 +583,8 @@ class OffboardControl(Node):
             if(self.pizza_closed_point_distance==0):
                 self.pizza_closed_point_distance = math.sqrt(pow(self.crossbow_location_confirmed[0]-self.crossbow_start_point[0],2)+pow(self.crossbow_location_confirmed[1]-self.crossbow_start_point[1],2))
             d = self.pizza_closed_point_distance
+            if(self.crossbow_location_confirmed[0]==0 and self.crossbow_location_confirmed[1]==0):
+                self.crossbow_location_confirmed = self.emergency_crossbow_location 
             self.goto_waypoint(self.crossbow_location_confirmed[0]+(3/d)*(self.crossbow_start_point[0]-self.crossbow_location_confirmed[0]), self.crossbow_location_confirmed[1]+(3/d)*(self.crossbow_start_point[1]-self.crossbow_location_confirmed[1]), self.crossbow_location_confirmed[2], delivery_velocity, 1)
             if(self.is_departed == 1):
                 self.is_delivery_going = 3
@@ -603,8 +611,13 @@ class OffboardControl(Node):
             self.publish_yaw_with_hovering(self.waypoint_contest[2][0], self.waypoint_contest[2][1], -7, 1, self.theta_yaw) ##고도 7m로 제자리 회전
             self.is_delivery_started -= 1
             if(self.is_delivery_started < -(2*math.pi/w)): ##2pi/w : w만큼 회전하면 2pi가 되는 거임 // 한 바퀴 돌았는지 확인하는 것
-                self.get_logger().info(f" balcony detected ") ## detected? 
-                self.is_delivery_started = 1
+                if(self.confirmed_balcony_location[0]==0 and self.confirmed_balcony_location[1]==0):
+                    self.get_logger().info(f" baclony detect failed. use emergence blacony location ")
+                    self.confirmed_balcony_location = self.emergency_balcony_location[:]
+                    self.is_delivery_started = 1
+                else:
+                    self.get_logger().info(f" balcony detected ") ## detected? 
+                    self.is_delivery_started = 1
             #(balcony 가장 가까운 위치 정보 subsribe)
             # self.balcony_location에 balcony 위치 저장
         else :
@@ -627,10 +640,13 @@ class OffboardControl(Node):
                     self.crossbow_start_point[0] += i[0]
                     self.crossbow_start_point[1] += i[1]
                     self.crossbow_start_point[2] += i[2]
-                self.crossbow_start_point[0] = self.crossbow_start_point[0]/crossbow_showed_list_num
-                self.crossbow_start_point[1] = self.crossbow_start_point[1]/crossbow_showed_list_num
-                self.crossbow_start_point[2] = self.crossbow_start_point[2]/crossbow_showed_list_num # 평균내서 정렬 위치 찾기 !!!
- 
+                if(crossbow_showed_list_num != 0):
+                    self.crossbow_start_point[0] = self.crossbow_start_point[0]/crossbow_showed_list_num
+                    self.crossbow_start_point[1] = self.crossbow_start_point[1]/crossbow_showed_list_num
+                    self.crossbow_start_point[2] = self.crossbow_start_point[2]/crossbow_showed_list_num # 평균내서 정렬 위치 찾기 !!!
+                if(self.crossbow_start_point[0]==0 and self.crossbow_start_point[1]==0):
+                    self.get_logger().info(f" fail to find proper location to algin drone with crossbow. use emergency location ")
+                    self.crossbow_start_point = self.emergency_crossbow_started_location 
 
     def ladder_detect_flight(self):
         self.circle_path_publish(self.waypoint_contest[1][0], self.waypoint_contest[1][1], self.waypoint_contest[1][2], 0.07, 8.5) ## 8.5m 반지름으로 원주비행, 0.07 rad/s 천천히 회전 (but 기준은 없다..)
@@ -640,6 +656,9 @@ class OffboardControl(Node):
             self.is_go_to_center = 0
             self.is_ladder_detected = 1
             self.initial_theta = -1
+            if(self.real_ladder_list[0][0]==0 and self.real_ladder_list[0][1]==0):
+                self.get_logger().info(f" ladder detected faild. use emergency ladder location ")
+                self.real_ladder_list = self.emergency_ladder_location
     
     def stay_in_moment(self, x, y, z, v, yaw):
         

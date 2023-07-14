@@ -288,7 +288,7 @@ class OffboardControl(Node):
             crossbow_sub = detect_crossbow() 
             guess_crossbow = crossbow_sub.r_cross_location()[:]
             crossbow_sub.destroy_node()
-            if(len(guess_crossbow)==0): 
+            if(len(guess_crossbow)==0 or (guess_crossbow[0]==0 and guess_crossbow[1]==0)): 
                 return 0
             if(self.confirmed_crossbow_num == 0):
                 self.crossbow_location_confirmed[0] = guess_crossbow[0]
@@ -499,7 +499,7 @@ class OffboardControl(Node):
             return
         self.publish_offboard_control_heartbeat_signal(True) ## position 제어
         if(self.initial_theta == -1): ## initial_theta 값에 저장된 것이 없을 때
-            self.get_logger().info(f" {[t_x, t_y, t_z]} circle path with r{radius} ")
+            self.get_logger().info(f" {[t_x, t_y, t_z]} circle path with r = {radius} m")
             self.theta = math.atan2(diff_y, diff_x)
             self.initial_theta = self.theta
         msg.x = float(t_x+radius * np.cos(self.theta))
@@ -515,7 +515,9 @@ class OffboardControl(Node):
         ##         wpt 2로 갈 때/          missionP 2로 갈 때 / comeback / wpt 2로 갈 때/         missionP 1로 갈 때
             self.is_mission_ladder += 1
         if (self.waypoint_count == 5 and self.is_mission_delivery == 0): ## wpt3을 지났을 때 & 배달을 아직 안 했을 때
+            self.get_logger().info(" departed at wpt 3 and delivering ")
             self.is_mission_delivery = 1 ## 배달 중, 배달 후
+
 
     def mission_ladder(self):
 
@@ -580,12 +582,17 @@ class OffboardControl(Node):
         elif(self.is_delivery_going == 2):
             # to crossbow
             self.cross_detect_on() # 본격적으로 십자가 위치 정보 저장
+
+            if(self.crossbow_location_confirmed[0]==0 and self.crossbow_location_confirmed[1]==0):
+                self.crossbow_location_confirmed = self.emergency_crossbow_location
+
             if(self.pizza_closed_point_distance==0):
                 self.pizza_closed_point_distance = math.sqrt(pow(self.crossbow_location_confirmed[0]-self.crossbow_start_point[0],2)+pow(self.crossbow_location_confirmed[1]-self.crossbow_start_point[1],2))
             d = self.pizza_closed_point_distance
-            if(self.crossbow_location_confirmed[0]==0 and self.crossbow_location_confirmed[1]==0):
-                self.crossbow_location_confirmed = self.emergency_crossbow_location 
+
+                
             self.goto_waypoint(self.crossbow_location_confirmed[0]+(3/d)*(self.crossbow_start_point[0]-self.crossbow_location_confirmed[0]), self.crossbow_location_confirmed[1]+(3/d)*(self.crossbow_start_point[1]-self.crossbow_location_confirmed[1]), self.crossbow_location_confirmed[2], delivery_velocity, 1)
+            
             if(self.is_departed == 1):
                 self.is_delivery_going = 3
                 self.is_departed = 0
@@ -612,7 +619,7 @@ class OffboardControl(Node):
             self.is_delivery_started -= 1
             if(self.is_delivery_started < -(2*math.pi/w)): ##2pi/w : w만큼 회전하면 2pi가 되는 거임 // 한 바퀴 돌았는지 확인하는 것
                 if(self.confirmed_balcony_location[0]==0 and self.confirmed_balcony_location[1]==0):
-                    self.get_logger().info(f" baclony detect failed. use emergence blacony location ")
+                    self.get_logger().info(f" balcony detect failed. use emergency balcony location ")
                     self.confirmed_balcony_location = self.emergency_balcony_location[:]
                     self.is_delivery_started = 1
                 else:
@@ -645,7 +652,7 @@ class OffboardControl(Node):
                     self.crossbow_start_point[1] = self.crossbow_start_point[1]/crossbow_showed_list_num
                     self.crossbow_start_point[2] = self.crossbow_start_point[2]/crossbow_showed_list_num # 평균내서 정렬 위치 찾기 !!!
                 if(self.crossbow_start_point[0]==0 and self.crossbow_start_point[1]==0):
-                    self.get_logger().info(f" fail to find proper location to algin drone with crossbow. use emergency location ")
+                    self.get_logger().info(f" fail to find proper location to align drone with crossbow. use emergency location ")
                     self.crossbow_start_point = self.emergency_crossbow_started_location 
 
     def ladder_detect_flight(self):

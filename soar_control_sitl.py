@@ -109,7 +109,7 @@ class OffboardControl(Node):
         self.vehicle_status = VehicleStatus()
         self.vehicle_odom = VehicleOdometry()
 
-        self.waypoint_contest = [[0,0,-2], [70, 30, -2], [140, 100, -2]] ##대회에서 주는 wpt 3개 #태현킴 여기야~
+        self.waypoint_contest = [[0,0,-2], [70, 30, -2], [140, 100, -2]] ##대회에서 주는 wpt 3개
         self.waypoint_list = [[0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, 0]] ## 코드 상 wpt들... ## 변환은 밑 함수에서 함
         #                      way1     mission1     way2   mission2    way3     way3      mission2      way2       mission1      way1      landing
         self.waypoint_velocity = [2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2]
@@ -177,7 +177,7 @@ class OffboardControl(Node):
         self.timer = self.create_timer(self.dt, self.timer_callback)
 
 
-        # variables for emergency #태현킴 여기도~
+        # variables for emergency
         self.emergency_ladder_location = [[67.5, 27.5, 1.5], [72.5, 32.5, 1.5]]
         self.emergency_balcony_location = [146, 100, -8]
         self.emergency_crossbow_started_location = [142, 100, -8]

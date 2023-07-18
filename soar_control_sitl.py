@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -* coding: utf-8 -*-
 ############################################################################
-#   version 230715 0058
+#   version 230719 0210
 #   Copyright (C) 2023 SOAR-Snowr1d. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@ from sklearn.cluster import KMeans
 import math
 import numpy as np
 
-#PX4' quaternion yaw 
+#PX4' quaternion yaw f
 def euler_from_quaternion(w, x, y, z): 
     t0 = +2 * (w*x+y*z)
     t1 = +1 - 2*(x*x+y*y)
@@ -81,7 +81,7 @@ class OffboardControl(Node):
     """Node for controlling a vehicle in offboard mode."""
 
     def __init__(self) -> None:
-        super().__init__('SOAR_HAVE_CONTROL')
+        super().__init__('SOAR_HAS_CONTROL')
 
         # Configure QoS profile for publishing and subscribing
         qos_profile = QoSProfile(
@@ -112,10 +112,11 @@ class OffboardControl(Node):
         self.vehicle_status = VehicleStatus()
         self.vehicle_odom = VehicleOdometry()
 
-        self.waypoint_contest = [[-1,-1,-15], [1.65, 50, -15], [16, 154, -15]] ##대회에서 주는 wpt 3개
+        self.waypoint_contest = [[-1,-1,-16], [52.25, 100.65, -16], [84, 182, -16]] ##대회에서 주는 wpt 3개 180.95, 90.8 -> 183, 85    ##thkim
         self.waypoint_list = [[0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, 0]] ## 코드 상 wpt들... ## 변환은 밑 함수에서 함
         #                      way1     mission1     way2   mission2    way3     way3      mission2      way2       mission1      way1      landing
         self.waypoint_velocity = [2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2]
+        #self.waypoint_velocity = [0.8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.8]  ##thkim
         self.waypoint_yaw = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0] ## yaw 가 1인 건 heading을 고정하는 것...
         self.waypoint_num = len(self.waypoint_list)
         self.waypoint_count = 0
@@ -183,6 +184,8 @@ class OffboardControl(Node):
         self.balcony_confirmed_y = 0
         self.balcony_list = []
         self.cross_location = [0, 0, -8]
+        self.crossbow_yaw_list = []
+        self.crossbow_subscribing = 0
 
         # Create a timer to publish control commands
         self.dt = 0.1
@@ -255,7 +258,7 @@ class OffboardControl(Node):
         if(self.offboard_setpoint_counter % 4 !=0):
             return
         if(len(msg.cells)!=1):
-            print("엥???")
+            #print("엥???")
             return
         self.balcony_confirmed_x = msg.cells[0].x
         self.balcony_confirmed_y = msg.cells[0].y
@@ -267,12 +270,26 @@ class OffboardControl(Node):
             history=HistoryPolicy.KEEP_LAST,
             depth=1
         )
-        cross_location_subscriber = self.create_subscription(
+        #self.cross_location[0] = 0
+        #self.cross_location[1] = 0
+        self.cross_location_subscriber = self.create_subscription(
             Point, 's2s_result', self.cross_callback, 10)
-        return self.cross_location
+        # 길이가 0이거나 self.cross_location[0]==0 
 
     def cross_callback(self, msg):
-        self.cross_location = [msg.x, msg.y, msg.z]
+        
+        self.crossbow_location[0] = msg.x
+        self.crossbow_location[1] = msg.y
+        self.crossbow_location[2] = msg.z
+        #print(1)
+        #print(self.cross_location[0])
+        if(self.crossbow_location[0]!=0):
+            #print(self.offboard_setpoint_counter)
+            yaw = math.atan2(self.confirmed_balcony_location[1]-self.vehicle_odom.y, self.confirmed_balcony_location[0]-self.vehicle_odom.x)
+            if(yaw<0):
+                yaw += math.pi*2
+            self.crossbow_yaw_list.append(yaw)
+        
 
     def vehicle_odom_callback(self, vehicle_odom):
         self.vehicle_odom = vehicle_odom
@@ -372,29 +389,35 @@ class OffboardControl(Node):
     def cross_detect_on(self):
         if(self.is_crossbow_detected == 0): #왜 self.is_crossbow_detected가 0일떄와 1일때를 구분했냐?? self.is_crossbow_detected가 0일 때 -> 드론이 십자가와 수직으로 정렬 위치를 아직 못찾은 상황, 1일 때는 정렬 위치를 찾은 상황임
                                             #내가 저번에 정렬 위치를 찾은 상황과 못찾은 상황에서 cross 정보를 다르게 저장할거라 했잖아? 정확도 이슈 때문에.. 그거 ㅇㅇ
-            guess_crossbow = self.detect_crossbow()
-            if (len(guess_crossbow) == 0 or (guess_crossbow[0]==0 and guess_crossbow[1]==0)):
+            
+            self.detect_crossbow()
+        
+            '''
+            guess_crossbow = self.crossbow_location
+            if (len(guess_crossbow) == 0 or (guess_crossbow[0]==0 and guess_crossbow[1]==0)): 
+                print("탐지되지 않음!")
                 return 0 #근데 갑자기 cross 정보가 사실 안들어왔었다면 서둘러 도망쳐야겠지?
-            self.crossbow_location[0] = guess_crossbow[0]
-            self.crossbow_location[1] = guess_crossbow[1]
-            self.crossbow_location[2] = guess_crossbow[2] # 정렬 위치를 못찾은 상황에서는 (아직 발코니를 돌고 있을 때) 십자가 위치 대충 저장~ 왜냐하면 이때 중요한 것은 '십자가가 발견되었을 때의 나의 위치' 거든. 왜냐? 정렬 위치 먼저 찾아야하기 때문
-
+            '''
+             # 정렬 위치를 못찾은 상황에서는 (아직 발코니를 돌고 있을 때) 십자가 위치 대충 저장~ 왜냐하면 이때 중요한 것은 '십자가가 발견되었을 때의 나의 위치' 거든. 왜냐? 정렬 위치 먼저 찾아야하기 때문
+    
         if(self.is_crossbow_detected == 1): # 정렬 위치 발견 -> 본격적으로 십자가 디텍팅 
-            guess_crossbow = self.detect_crossbow()
-            if(len(guess_crossbow)==0 or (guess_crossbow[0]==0 and guess_crossbow[1]==0)): 
+            #guess_crossbow = self.detect_crossbow()
+            self.detect_crossbow()
+            if(self.crossbow_location[0]==0 and self.crossbow_location[1]==0): 
                 return 0
             if(self.confirmed_crossbow_num == 0):
-                self.crossbow_location_confirmed[0] = guess_crossbow[0]
-                self.crossbow_location_confirmed[1] = guess_crossbow[1]
-                self.crossbow_location_confirmed[2] = guess_crossbow[2]
+                self.crossbow_location_confirmed[0] = self.crossbow_location[0]
+                self.crossbow_location_confirmed[1] = self.crossbow_location[1]
+                self.crossbow_location_confirmed[2] = self.crossbow_location[2]
                 self.confirmed_crossbow_num +=1
             else:
-                self.crossbow_location_confirmed[0] = (self.crossbow_location_confirmed[0]) * (self.confirmed_crossbow_num/(self.confirmed_crossbow_num+1)) + guess_crossbow[0]/(self.confirmed_crossbow_num+1)
-                self.crossbow_location_confirmed[1] = (self.crossbow_location_confirmed[1]) * (self.confirmed_crossbow_num/(self.confirmed_crossbow_num+1)) + guess_crossbow[1]/(self.confirmed_crossbow_num+1)
-                self.crossbow_location_confirmed[2] = (self.crossbow_location_confirmed[2]) * (self.confirmed_crossbow_num/(self.confirmed_crossbow_num+1)) + guess_crossbow[2]/(self.confirmed_crossbow_num+1)
+                self.crossbow_location_confirmed[0] = (self.crossbow_location_confirmed[0]) * (self.confirmed_crossbow_num/(self.confirmed_crossbow_num+1)) + self.crossbow_location[0]/(self.confirmed_crossbow_num+1)
+                self.crossbow_location_confirmed[1] = (self.crossbow_location_confirmed[1]) * (self.confirmed_crossbow_num/(self.confirmed_crossbow_num+1)) + self.crossbow_location[1]/(self.confirmed_crossbow_num+1)
+                self.crossbow_location_confirmed[2] = (self.crossbow_location_confirmed[2]) * (self.confirmed_crossbow_num/(self.confirmed_crossbow_num+1)) + self.crossbow_location[2]/(self.confirmed_crossbow_num+1)
                 self.confirmed_crossbow_num += 1 # 계속 십자가 위치 정보 평균 내기
                 print("cross 좌표 보정됨 : " + str(self.crossbow_location_confirmed))
             return 1
+        return 1
 
                 
 
@@ -651,7 +674,7 @@ class OffboardControl(Node):
         distance_w2_w3 = math.sqrt(pow(waypoint_2[0]-waypoint_3[0],2)+pow(waypoint_2[1]-waypoint_3[1],2)+pow(waypoint_2[2]-waypoint_3[2], 2))
         mission_point_1 = [waypoint_2[0]-(8.5*((waypoint_2[0]-waypoint_1[0])/distance_w1_w2)), waypoint_2[1]-(8.5*((waypoint_2[1]-waypoint_1[1])/distance_w1_w2)), waypoint_1[2]] ## mission point 
         mission_point_2 = [waypoint_2[0]+(8.5*((waypoint_3[0]-waypoint_2[0])/distance_w2_w3)), waypoint_2[1]+(8.5*((waypoint_3[1]-waypoint_2[1])/distance_w2_w3)), waypoint_2[2]]
-        self.waypoint_list = [waypoint_1, mission_point_1, waypoint_2, mission_point_2, waypoint_3, waypoint_3, mission_point_2, waypoint_2, mission_point_1, waypoint_1,  [waypoint_1[0], waypoint_1[1], 0]]
+        self.waypoint_list = [waypoint_1, mission_point_1, waypoint_2, mission_point_2, waypoint_3, waypoint_3, mission_point_2, waypoint_2, mission_point_1, waypoint_1,  [-1, -1, -1]]
                             #   0                1            2             3               4            5               6              7             8                    9
         
     def mission_delivery(self):
@@ -710,7 +733,7 @@ class OffboardControl(Node):
             self.theta_yaw += w ## 제자리 회전을 위한 w 합
             self.balcony_detect_on() # 들어오는 포인트 클라우드 정보 subscribe 해서 발코니 정보 저장
   
-            self.publish_yaw_with_hovering(self.waypoint_contest[2][0], self.waypoint_contest[2][1], -7, 1, self.theta_yaw) ##고도 7m로 제자리 회전
+            self.publish_yaw_with_hovering(self.waypoint_contest[2][0], self.waypoint_contest[2][1], -7, 2, self.theta_yaw) ##고도 7m로 제자리 회전
             self.is_delivery_started -= 1
             if(self.is_delivery_started < -(2*math.pi/w)): ##2pi/w : w만큼 회전하면 2pi가 되는 거임 // 한 바퀴 돌았는지 확인하는 것
                 if(self.confirmed_balcony_location[0]==0 and self.confirmed_balcony_location[1]==0):
@@ -724,12 +747,15 @@ class OffboardControl(Node):
             # self.balcony_location에 balcony 위치 저장
         else :
             #print(1)
-            self.circle_path_publish(self.confirmed_balcony_location[0], self.confirmed_balcony_location[1], -7, 0.1, 8.5) ## 발코니 중심으로 반지름 6m circle 회전
-          
-            if(self.cross_detect_on()): # 왜 갑자기 if문에 넣냐면.. 이 함수가 십자가가 보이지 않는다면 return 0을 하기 때문. 만약 십자가가 보인다면 함수 돌아가면서 십자가 정보 저장
+            self.circle_path_publish(self.confirmed_balcony_location[0], self.confirmed_balcony_location[1], -7, 0.3, 8.5) ## 발코니 중심으로 반지름 6m circle 회전
+            ''''            if(self.cross_detect_on()): # 왜 갑자기 if문에 넣냐면.. 이 함수가 십자가가 보이지 않는다면 return 0을 하기 때문. 만약 십자가가 보인다면 함수 돌아가면서 십자가 정보 저장
+                self.get_logger().info(f" 위치 저장됨! ")
                 self.crossbow_showed_list.append([self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]) # 십자가를 돌며 십자가가 보일 때의 드론의 위치 정보 저장 
-             
-
+                yaw = math.atan2(self.confirmed_balcony_location[1]-self.vehicle_odom.y, self.confirmed_balcony_location[0]-self.vehicle_odom.x)
+                yaw += (math.pi * 2)
+                self.crossbow_yaw_list.append(yaw)
+            '''
+            self.cross_detect_on()
             if (self.theta-self.initial_theta > math.pi *2 ): # 한 바퀴 돌기 ## 한 바퀴 돌고 이것저것 바꾸기
                 self.circle_path = 0
                 self.is_go_to_center = 0
@@ -738,6 +764,7 @@ class OffboardControl(Node):
 
                 crossbow_showed_list_num = len(self.crossbow_showed_list)
                 self.crossbow_start_point = [0, 0, 0]
+                '''
                 for i in self.crossbow_showed_list:
                     self.crossbow_start_point[0] += i[0]
                     self.crossbow_start_point[1] += i[1]
@@ -748,10 +775,25 @@ class OffboardControl(Node):
                     self.crossbow_start_point[2] = self.crossbow_start_point[2]/crossbow_showed_list_num # 평균내서 정렬 위치 찾기 !!!
                 if(self.crossbow_start_point[0]==0 and self.crossbow_start_point[1]==0):
                     self.get_logger().info(f" fail to find proper location to align drone with crossbow. use emergency location ")
+                    self.crossbow_start_point = self.emergency_crossbow_started_location
+                else:
+                    self.get_logger().info(f" cross detected ")
+                '''
+                total_yaw = 0
+                for y in self.crossbow_yaw_list:
+                    total_yaw += y
+                if (len(self.crossbow_yaw_list)!=0):
+                    total_yaw /= len(self.crossbow_yaw_list)
+                    self.crossbow_start_point[0] = self.confirmed_balcony_location[0]+math.cos(total_yaw) * 8.5
+                    self.crossbow_start_point[1] = self.confirmed_balcony_location[1]+math.sin(total_yaw) * 8.5
+                    self.crossbow_start_point[2] = self.crossbow_location[2]
+                else:
+                    self.get_logger().info(f"fail to find proper location to align drone with crossbow. use emergency location ")
                     self.crossbow_start_point = self.emergency_crossbow_started_location 
+                #print(self.crossbow_yaw_list)
 
     def ladder_detect_flight(self):
-        self.circle_path_publish(self.waypoint_contest[1][0], self.waypoint_contest[1][1], self.waypoint_contest[1][2], 0.07, 8.5) ## 8.5m 반지름으로 원주비행, 0.07 rad/s 천천히 회전 (but 기준은 없다..)
+        self.circle_path_publish(self.waypoint_contest[1][0], self.waypoint_contest[1][1], self.waypoint_contest[1][2], 0.25, 8.5) ## 8.5m 반지름으로 원주비행, 0.07 rad/s 천천히 회전 (but 기준은 없다..)
         #if( (self.offboard_setpoint_counter % 3 ==0) and (self.offboard_setpoint_counter % 5 == 0)):
         self.ladder_detect_on()
         if(self.theta-self.initial_theta > math.pi * 2): ## 회전 이후
@@ -832,6 +874,10 @@ class OffboardControl(Node):
             self.waypoint_update()
         
         self.offboard_setpoint_counter += 1
+        #print("crossbow 확정 위치")
+        #print(self.crossbow_location_confirmed)
+        #print("crossbow 임시 위치")
+        #print(self.crossbow_location)
        
 
        

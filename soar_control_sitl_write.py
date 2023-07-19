@@ -46,6 +46,7 @@ from sklearn.cluster import KMeans
 import math
 import numpy as np
 
+
 #PX4' quaternion yaw f
 def euler_from_quaternion(w, x, y, z): 
     t0 = +2 * (w*x+y*z)
@@ -78,6 +79,7 @@ def arrange_shortest_point(now_x, now_y, points):
 
 
 class OffboardControl(Node):
+    
     """Node for controlling a vehicle in offboard mode."""
 
     def __init__(self) -> None:
@@ -687,7 +689,7 @@ class OffboardControl(Node):
         distance_w2_w3 = math.sqrt(pow(waypoint_2[0]-waypoint_3[0],2)+pow(waypoint_2[1]-waypoint_3[1],2)+pow(waypoint_2[2]-waypoint_3[2], 2))
         mission_point_1 = [waypoint_2[0]-(8.5*((waypoint_2[0]-waypoint_1[0])/distance_w1_w2)), waypoint_2[1]-(8.5*((waypoint_2[1]-waypoint_1[1])/distance_w1_w2)), waypoint_1[2]] ## mission point 
         mission_point_2 = [waypoint_2[0]+(8.5*((waypoint_3[0]-waypoint_2[0])/distance_w2_w3)), waypoint_2[1]+(8.5*((waypoint_3[1]-waypoint_2[1])/distance_w2_w3)), waypoint_2[2]]
-        self.waypoint_list = [waypoint_1, mission_point_1, waypoint_2, mission_point_2, waypoint_3, waypoint_3, mission_point_2, waypoint_2, mission_point_1, waypoint_1,  [0, 0, -1]]
+        self.waypoint_list = [waypoint_1, mission_point_1, waypoint_2, mission_point_2, waypoint_3, waypoint_3, mission_point_2, waypoint_2, mission_point_1, waypoint_1,  [-1, -1, -1]]
                             #   0                1            2             3               4            5               6              7             8                    9
         
     def mission_delivery(self):
@@ -764,7 +766,7 @@ class OffboardControl(Node):
             # self.balcony_location에 balcony 위치 저장
         else :
             #print(1)
-            self.circle_path_publish(self.confirmed_balcony_location[0], self.confirmed_balcony_location[1], -7.5, 0.15, 8.5) ## 발코니 중심으로 반지름 6m circle 회전
+            self.circle_path_publish(self.confirmed_balcony_location[0], self.confirmed_balcony_location[1], -7.5, 0.1, 8.5) ## 발코니 중심으로 반지름 6m circle 회전
             ''''            if(self.cross_detect_on()): # 왜 갑자기 if문에 넣냐면.. 이 함수가 십자가가 보이지 않는다면 return 0을 하기 때문. 만약 십자가가 보인다면 함수 돌아가면서 십자가 정보 저장
                 self.get_logger().info(f" 위치 저장됨! ")
                 self.crossbow_showed_list.append([self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]) # 십자가를 돌며 십자가가 보일 때의 드론의 위치 정보 저장 
@@ -846,6 +848,8 @@ class OffboardControl(Node):
         self.mission_check()
 
     def timer_callback(self) -> None:
+        if(self.offboard_setpoint_counter % 20 == 0 and self.offboard_setpoint_counter>21):
+            (self.f).write('['+str(self.vehicle_odom.x)+", "+str(self.vehicle_odom.y)+", "+str(self.vehicle_odom.z)+'],'+"\n")
         
         #self.get_logger().info(f"local position {[self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]}")
         """Callback function for the timer."""
@@ -859,6 +863,7 @@ class OffboardControl(Node):
             self.engage_offboard_mode()
             self.arm()
             self.make_points_for_contest(self.waypoint_contest[0], self.waypoint_contest[1], self.waypoint_contest[2]) ## 시작 시 받은 wpt 3점을 코드에서 쓸 wpt 리스트에 넣음
+            self.f = open('/home/kimseheon/flight_log_dataset/flight_log.txt', 'w')
         
         if(self.waypoint_count == 2 and self.is_mission_ladder_finished == 0): ## ?? mw1에 도착해서 wpt 2로 가야 할 때 & wpt_count가 2일 때 (wpt 2로 갈 때) & ladder mission이 안 끝났을 때
             if(self.stayed_finished == 0):
@@ -889,12 +894,16 @@ class OffboardControl(Node):
        
         if(self.is_departed == 1 and (self.waypoint_count < self.waypoint_num)): # next waypoint update ## wpt에 도달했고 다음 wpt가 존재
             self.waypoint_update()
-        
+            if(self.waypoint_count == self.waypoint_num):
+                (self.f).close()
+
         self.offboard_setpoint_counter += 1
+
         #print("crossbow 확정 위치")
         #print(self.crossbow_location_confirmed)
         #print("crossbow 임시 위치")
         #print(self.crossbow_location)
+        
        
 
        

@@ -32,6 +32,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 ############################################################################
+from re import T
 import sys
 from SE_algorithm import SE
 #from detect_object import detect_ladder, detect_balcony, detect_crossbow
@@ -46,6 +47,7 @@ from sklearn.cluster import KMeans
 import math
 import numpy as np
 
+#PX4' quaternion yaw 
 def plus_radian(w, plus_w):
     w += plus_w
     if(w>2*math.pi):
@@ -54,7 +56,7 @@ def plus_radian(w, plus_w):
         w+=2*math.pi
     return w 
 
-#PX4' quaternion yaw f
+
 def euler_from_quaternion(w, x, y, z): 
     t0 = +2 * (w*x+y*z)
     t1 = +1 - 2*(x*x+y*y)
@@ -86,11 +88,10 @@ def arrange_shortest_point(now_x, now_y, points):
 
 
 class OffboardControl(Node):
-    
     """Node for controlling a vehicle in offboard mode."""
 
     def __init__(self) -> None:
-        super().__init__('SOAR_HAS_CONTROL')
+        super().__init__('SOAR_HAVE_CONTROL')
 
         # Configure QoS profile for publishing and subscribing
         qos_profile = QoSProfile(
@@ -116,16 +117,21 @@ class OffboardControl(Node):
         self.vehicle_odom_subscriber = self.create_subscription(VehicleOdometry, '/fmu/vehicle_odometry/out', self.vehicle_odom_callback, qos_profile)
 
         # Initialize variables
+        self.end_p = 0
+        self.w_count = 0 
+
+        self.now_yaw = 0
+
+
         self.offboard_setpoint_counter = 0
         self.vehicle_local_position = VehicleLocalPosition()
         self.vehicle_status = VehicleStatus()
         self.vehicle_odom = VehicleOdometry()
 
-        self.waypoint_contest = [[-1,-1,-16], [52.25, 100.65, -16], [84, 182, -16]] ##대회에서 주는 wpt 3개 180.95, 90.8 -> 183, 85    ##thkim
+        self.waypoint_contest = [[-1,-1,-15], [1.65, 50, -15], [16, 154, -15]] ##대회에서 주는 wpt 3개
         self.waypoint_list = [[0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0,0,-2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, -2], [0, 0, 0]] ## 코드 상 wpt들... ## 변환은 밑 함수에서 함
         #                      way1     mission1     way2   mission2    way3     way3      mission2      way2       mission1      way1      landing
-        self.waypoint_velocity = [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2]
-        #self.waypoint_velocity = [0.8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.8]  ##thkim
+        self.waypoint_velocity = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         self.waypoint_yaw = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0] ## yaw 가 1인 건 heading을 고정하는 것...
         self.waypoint_num = len(self.waypoint_list)
         self.waypoint_count = 0
@@ -140,15 +146,13 @@ class OffboardControl(Node):
         self.stable_odom = [0, 0, 0]
         self.is_go_to_circle_point = 0
         self.stayed_finished = 0
+        self.change_yaw = -1
 
         self.wait_time = 0
+        self.is_yaw_arranged = 0
     
         self.is_new_go = 0 ## 다음 wpt가 존재하는지
         self.is_departed = 0 ## wpt에 도달했는지 
-
-        self.now_yaw = 0
-        self.change_yaw = -1
-        self.is_yaw_arranged = 0
         
         
         #variables for ladder
@@ -197,9 +201,6 @@ class OffboardControl(Node):
         self.balcony_confirmed_y = 0
         self.balcony_list = []
         self.cross_location = [0, 0, -8]
-        self.crossbow_yaw_list = []
-        self.crossbow_subscribing = 0
-        self.previous_crossbow_msg = [0,0,0]
 
         # Create a timer to publish control commands
         self.dt = 0.1
@@ -272,7 +273,7 @@ class OffboardControl(Node):
         if(self.offboard_setpoint_counter % 4 !=0):
             return
         if(len(msg.cells)!=1):
-            #print("엥???")
+            print("엥???")
             return
         self.balcony_confirmed_x = msg.cells[0].x
         self.balcony_confirmed_y = msg.cells[0].y
@@ -284,41 +285,17 @@ class OffboardControl(Node):
             history=HistoryPolicy.KEEP_LAST,
             depth=1
         )
-        #self.cross_location[0] = 0
-        #self.cross_location[1] = 0
-        self.cross_location_subscriber = self.create_subscription(
-            Point, 's2s_result', self.cross_callback, 1)
-        # 길이가 0이거나 self.cross_location[0]==0 
+        cross_location_subscriber = self.create_subscription(
+            Point, 's2s_result', self.cross_callback, 10)
+        return self.cross_location
 
+    def cross_callback(self, msg):
+        self.cross_location = [msg.x, msg.y, msg.z]
 
     def vehicle_odom_callback(self, vehicle_odom):
         self.vehicle_odom = vehicle_odom
-        self.now_yaw = euler_from_quaternion(self.vehicle_odom.q[0], self.vehicle_odom.q[1], self.vehicle_odom.q[2], self.vehicle_odom.q[3])
+        self.now_yaw = euler_from_quaternion(self.vehicle_odom.q[0], self.vehicle_odom.q[1], self.vehicle_odom.q[2], self.vehicle_odom.q[3]) ## 현 위치에 대한 theta값 설정
         
-    def cross_callback(self, msg):
-        if(msg.z<-9 or msg.z>-6.5):
-            return
-        distance_from_way3 = math.sqrt(math.pow(self.waypoint_contest[2][0]-msg.x,2)+math.pow(self.waypoint_contest[2][1]-msg.y,2))
-        if(distance_from_way3>10):
-            return        
-        self.crossbow_location[0] = msg.x
-        self.crossbow_location[1] = msg.y
-        self.crossbow_location[2] = msg.z
-        if(self.previous_crossbow_msg[0]==msg.x and self.previous_crossbow_msg[1]==msg.y):
-            return
-        #print(1)
-        #print(self.cross_location[0])
-        if(self.crossbow_location[0]!=0):
-            #print(self.offboard_setpoint_counter)
-            yaw = math.atan2(self.vehicle_odom.y-self.confirmed_balcony_location[1], self.vehicle_odom.x-self.confirmed_balcony_location[0])
-            if(yaw<0):
-                yaw += (math.pi*2)
-            print(yaw)
-            self.crossbow_yaw_list.append(yaw)
-            self.previous_crossbow_msg[0] = msg.x
-            self.previous_crossbow_msg[1] = msg.y
-            self.previous_crossbow_msg[2] = msg.z        
-
 
     def vehicle_local_position_callback(self, vehicle_local_position):
         """Callback function for vehicle_local_position topic subscriber."""
@@ -414,37 +391,29 @@ class OffboardControl(Node):
     def cross_detect_on(self):
         if(self.is_crossbow_detected == 0): #왜 self.is_crossbow_detected가 0일떄와 1일때를 구분했냐?? self.is_crossbow_detected가 0일 때 -> 드론이 십자가와 수직으로 정렬 위치를 아직 못찾은 상황, 1일 때는 정렬 위치를 찾은 상황임
                                             #내가 저번에 정렬 위치를 찾은 상황과 못찾은 상황에서 cross 정보를 다르게 저장할거라 했잖아? 정확도 이슈 때문에.. 그거 ㅇㅇ
-            
-            self.detect_crossbow()
-        
-            '''
-            guess_crossbow = self.crossbow_location
-            if (len(guess_crossbow) == 0 or (guess_crossbow[0]==0 and guess_crossbow[1]==0)): 
-                print("탐지되지 않음!")
+            guess_crossbow = self.detect_crossbow()
+            if (len(guess_crossbow) == 0 or (guess_crossbow[0]==0 and guess_crossbow[1]==0)):
                 return 0 #근데 갑자기 cross 정보가 사실 안들어왔었다면 서둘러 도망쳐야겠지?
-            '''
-             # 정렬 위치를 못찾은 상황에서는 (아직 발코니를 돌고 있을 때) 십자가 위치 대충 저장~ 왜냐하면 이때 중요한 것은 '십자가가 발견되었을 때의 나의 위치' 거든. 왜냐? 정렬 위치 먼저 찾아야하기 때문
-    
+            self.crossbow_location[0] = guess_crossbow[0]
+            self.crossbow_location[1] = guess_crossbow[1]
+            self.crossbow_location[2] = guess_crossbow[2] # 정렬 위치를 못찾은 상황에서는 (아직 발코니를 돌고 있을 때) 십자가 위치 대충 저장~ 왜냐하면 이때 중요한 것은 '십자가가 발견되었을 때의 나의 위치' 거든. 왜냐? 정렬 위치 먼저 찾아야하기 때문
+
         if(self.is_crossbow_detected == 1): # 정렬 위치 발견 -> 본격적으로 십자가 디텍팅 
-            #guess_crossbow = self.detect_crossbow()
-            self.detect_crossbow()
-            if(self.crossbow_location[0]==0 and self.crossbow_location[1]==0): 
+            guess_crossbow = self.detect_crossbow()
+            if(len(guess_crossbow)==0 or (guess_crossbow[0]==0 and guess_crossbow[1]==0)): 
                 return 0
             if(self.confirmed_crossbow_num == 0):
-                self.crossbow_location_confirmed[0] = self.crossbow_location[0]
-                self.crossbow_location_confirmed[1] = self.crossbow_location[1]
-                self.crossbow_location_confirmed[2] = self.crossbow_location[2]
+                self.crossbow_location_confirmed[0] = guess_crossbow[0]
+                self.crossbow_location_confirmed[1] = guess_crossbow[1]
+                self.crossbow_location_confirmed[2] = guess_crossbow[2]
                 self.confirmed_crossbow_num +=1
             else:
-                cross_distance = math.sqrt(math.pow(self.vehicle_odom.x - self.crossbow_location_confirmed[0],2)+math.pow(self.vehicle_odom.y-self.crossbow_location_confirmed[1],2))
-                if(cross_distance<4):
-                    self.crossbow_location_confirmed[0] = (self.crossbow_location_confirmed[0]) * (self.confirmed_crossbow_num/(self.confirmed_crossbow_num+1)) + self.crossbow_location[0]/(self.confirmed_crossbow_num+1)
-                    self.crossbow_location_confirmed[1] = (self.crossbow_location_confirmed[1]) * (self.confirmed_crossbow_num/(self.confirmed_crossbow_num+1)) + self.crossbow_location[1]/(self.confirmed_crossbow_num+1)
-                    self.crossbow_location_confirmed[2] = (self.crossbow_location_confirmed[2]) * (self.confirmed_crossbow_num/(self.confirmed_crossbow_num+1)) + self.crossbow_location[2]/(self.confirmed_crossbow_num+1)
-                    self.confirmed_crossbow_num += 1 # 계속 십자가 위치 정보 평균 내기
-                #print("cross 좌표 보정됨 : " + str(self.crossbow_location_confirmed))
+                self.crossbow_location_confirmed[0] = (self.crossbow_location_confirmed[0]) * (self.confirmed_crossbow_num/(self.confirmed_crossbow_num+1)) + guess_crossbow[0]/(self.confirmed_crossbow_num+1)
+                self.crossbow_location_confirmed[1] = (self.crossbow_location_confirmed[1]) * (self.confirmed_crossbow_num/(self.confirmed_crossbow_num+1)) + guess_crossbow[1]/(self.confirmed_crossbow_num+1)
+                self.crossbow_location_confirmed[2] = (self.crossbow_location_confirmed[2]) * (self.confirmed_crossbow_num/(self.confirmed_crossbow_num+1)) + guess_crossbow[2]/(self.confirmed_crossbow_num+1)
+                self.confirmed_crossbow_num += 1 # 계속 십자가 위치 정보 평균 내기
+                print("cross 좌표 보정됨 : " + str(self.crossbow_location_confirmed))
             return 1
-        return 1
 
                 
 
@@ -659,7 +628,7 @@ class OffboardControl(Node):
         if (self.distance_target < self.waypoint_range) & (self.waypoint_count != (self.waypoint_num-1)): ## waypoint_range 안에 들어오고 다음 wpt 가 존재한다면
 
             self.wait_in_waypoint += 1
-            if (self.wait_in_waypoint == 10): ## ? 10으로 줄인 이유가 뭘까 ##빠르게 하고 싶었어
+            if (self.wait_in_waypoint == 30): ## ? 10으로 줄인 이유가 뭘까 ##빠르게 하고 싶었어
                 self.previous_waypoint[0] = self.vehicle_odom.x
                 self.previous_waypoint[1] = self.vehicle_odom.y
                 self.previous_waypoint[2] = self.vehicle_odom.z
@@ -729,7 +698,7 @@ class OffboardControl(Node):
 
         if(self.is_mission_started == 1): ## (wpt 도착 후 다음 wpt로 갈 때 == is_mission_started)
             se1 = SE(self.real_ladder_list) ## 장애물 정보를 SE 알고리즘 돌려서 list 추가
-            self.sub_positions = make_orth_points(self.real_ladder_list[0][0], self.real_ladder_list[0][1], self.real_ladder_list[1][0], self.real_ladder_list[1][1], 2.5)
+            self.sub_positions = make_orth_points(self.real_ladder_list[0][0], self.real_ladder_list[0][1], self.real_ladder_list[1][0], self.real_ladder_list[1][1], 2)
             arrange_shortest_point(self.waypoint_list[self.waypoint_count-1][0], self.waypoint_list[self.waypoint_count-1][1], self.sub_positions)
             self.get_logger().info(f" {[self.waypoint_list[self.waypoint_count][0], self.waypoint_list[self.waypoint_count][1], self.waypoint_list[self.waypoint_count][2]]}로 가기 위한 SE 알고리즘 경로를 생성합니다. ")
             
@@ -763,11 +732,11 @@ class OffboardControl(Node):
         distance_w2_w3 = math.sqrt(pow(waypoint_2[0]-waypoint_3[0],2)+pow(waypoint_2[1]-waypoint_3[1],2)+pow(waypoint_2[2]-waypoint_3[2], 2))
         mission_point_1 = [waypoint_2[0]-(8.5*((waypoint_2[0]-waypoint_1[0])/distance_w1_w2)), waypoint_2[1]-(8.5*((waypoint_2[1]-waypoint_1[1])/distance_w1_w2)), waypoint_1[2]] ## mission point 
         mission_point_2 = [waypoint_2[0]+(8.5*((waypoint_3[0]-waypoint_2[0])/distance_w2_w3)), waypoint_2[1]+(8.5*((waypoint_3[1]-waypoint_2[1])/distance_w2_w3)), waypoint_2[2]]
-        self.waypoint_list = [waypoint_1, mission_point_1, waypoint_2, mission_point_2, waypoint_3, waypoint_3, mission_point_2, waypoint_2, mission_point_1, waypoint_1,  [0, 0, -1]]
+        self.waypoint_list = [waypoint_1, mission_point_1, waypoint_2, mission_point_2, waypoint_3, waypoint_3, mission_point_2, waypoint_2, mission_point_1, waypoint_1,  [waypoint_1[0], waypoint_1[1], 0]]
                             #   0                1            2             3               4            5               6              7             8                    9
         
     def mission_delivery(self):
-        delivery_velocity = 0.5 ## crossbow_started > crossbow
+        delivery_velocity = 0.8 ## crossbow_started > crossbow
         if(self.is_delivery_going == 0):
             if(self.is_crossbow_detected == 0):
                 self.cross_bow_detect()
@@ -785,7 +754,6 @@ class OffboardControl(Node):
             if(self.offboard_setpoint_counter - self.wait_in_deliverypoint > 20):
                 self.get_logger().info(f" pizza is going " )
                 self.is_delivery_going = 2
-                self.wait_in_delivery_point = 0
         elif(self.is_delivery_going == 2):
             # to crossbow
             self.cross_detect_on() # 본격적으로 십자가 위치 정보 저장
@@ -802,17 +770,14 @@ class OffboardControl(Node):
             self.goto_waypoint(self.crossbow_location_confirmed[0]+(3/d)*(self.crossbow_start_point[0]-self.crossbow_location_confirmed[0]), self.crossbow_location_confirmed[1]+(3/d)*(self.crossbow_start_point[1]-self.crossbow_location_confirmed[1]), self.crossbow_location_confirmed[2], delivery_velocity, 1)
             
             if(self.is_departed == 1):
-                if(self.wait_in_delivery_point == 0):
-                    self.wait_in_delivery_point = self.offboard_setpoint_counter
-                if(self.offboard_setpoint_counter - self.wait_in_delivery_point == 40):
-                    self.is_delivery_going = 3
+                self.is_delivery_going = 3
                 self.is_departed = 0
         elif(self.is_delivery_going == 3):
             self.get_logger().info(f" delivery finished ")
             self.is_mission_delivery = -1
     
     def cross_bow_detect(self):
-        w = 0.025 ## radian
+        w = 0.01 ## radian
         if (self.is_delivery_started == 0): ## 아직 배달 미션 시작 전
             #self.goto_waypoint(self.waypoint_contest[2][0], self.waypoint_contest[2][1], -7, 1, 0)
             self.goto_waypoint(self.waypoint_contest[2][0],self.waypoint_contest[2][1],-7,1,0) ## (wpt3 이후) 고도 7m로 하강 
@@ -826,7 +791,7 @@ class OffboardControl(Node):
             self.theta_yaw += w ## 제자리 회전을 위한 w 합
             self.balcony_detect_on() # 들어오는 포인트 클라우드 정보 subscribe 해서 발코니 정보 저장
   
-            self.publish_yaw_with_hovering(self.waypoint_contest[2][0], self.waypoint_contest[2][1], -7, 2, self.theta_yaw) ##고도 7m로 제자리 회전
+            self.publish_yaw_with_hovering(self.waypoint_contest[2][0], self.waypoint_contest[2][1], -7, 1, self.theta_yaw) ##고도 7m로 제자리 회전
             self.is_delivery_started -= 1
             if(self.is_delivery_started < -(2*math.pi/w)): ##2pi/w : w만큼 회전하면 2pi가 되는 거임 // 한 바퀴 돌았는지 확인하는 것
                 if(self.confirmed_balcony_location[0]==0 and self.confirmed_balcony_location[1]==0):
@@ -840,24 +805,21 @@ class OffboardControl(Node):
             # self.balcony_location에 balcony 위치 저장
         else :
             #print(1)
-            self.circle_path_publish(self.confirmed_balcony_location[0], self.confirmed_balcony_location[1], -7.5, 0.1, 8.5) ## 발코니 중심으로 반지름 6m circle 회전
-            ''''            if(self.cross_detect_on()): # 왜 갑자기 if문에 넣냐면.. 이 함수가 십자가가 보이지 않는다면 return 0을 하기 때문. 만약 십자가가 보인다면 함수 돌아가면서 십자가 정보 저장
-                self.get_logger().info(f" 위치 저장됨! ")
+            self.circle_path_publish(self.confirmed_balcony_location[0], self.confirmed_balcony_location[1], -7, 0.1, 8.5) ## 발코니 중심으로 반지름 6m circle 회전
+          
+            if(self.cross_detect_on()): # 왜 갑자기 if문에 넣냐면.. 이 함수가 십자가가 보이지 않는다면 return 0을 하기 때문. 만약 십자가가 보인다면 함수 돌아가면서 십자가 정보 저장
                 self.crossbow_showed_list.append([self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]) # 십자가를 돌며 십자가가 보일 때의 드론의 위치 정보 저장 
-                yaw = math.atan2(self.confirmed_balcony_location[1]-self.vehicle_odom.y, self.confirmed_balcony_location[0]-self.vehicle_odom.x)
-                yaw += (math.pi * 2)
-                self.crossbow_yaw_list.append(yaw)
-            '''
-            self.cross_detect_on()
+             
+
             if (self.theta-self.initial_theta > math.pi *2 ): # 한 바퀴 돌기 ## 한 바퀴 돌고 이것저것 바꾸기
                 self.circle_path = 0
                 self.is_go_to_center = 0
                 self.is_go_to_circle_point = 0
                 self.is_crossbow_detected = 1
+                self.is_yaw_arranged = 0
 
                 crossbow_showed_list_num = len(self.crossbow_showed_list)
                 self.crossbow_start_point = [0, 0, 0]
-                '''
                 for i in self.crossbow_showed_list:
                     self.crossbow_start_point[0] += i[0]
                     self.crossbow_start_point[1] += i[1]
@@ -868,25 +830,10 @@ class OffboardControl(Node):
                     self.crossbow_start_point[2] = self.crossbow_start_point[2]/crossbow_showed_list_num # 평균내서 정렬 위치 찾기 !!!
                 if(self.crossbow_start_point[0]==0 and self.crossbow_start_point[1]==0):
                     self.get_logger().info(f" fail to find proper location to align drone with crossbow. use emergency location ")
-                    self.crossbow_start_point = self.emergency_crossbow_started_location
-                else:
-                    self.get_logger().info(f" cross detected ")
-                '''
-                total_yaw = 0
-                for y in self.crossbow_yaw_list:
-                    total_yaw += y
-                if (len(self.crossbow_yaw_list)!=0):
-                    total_yaw /= len(self.crossbow_yaw_list)
-                    self.crossbow_start_point[0] = self.confirmed_balcony_location[0]+math.cos(total_yaw) * 8.5
-                    self.crossbow_start_point[1] = self.confirmed_balcony_location[1]+math.sin(total_yaw) * 8.5
-                    self.crossbow_start_point[2] = self.crossbow_location[2]
-                else:
-                    self.get_logger().info(f"fail to find proper location to align drone with crossbow. use emergency location ")
                     self.crossbow_start_point = self.emergency_crossbow_started_location 
-                #print(self.crossbow_yaw_list)
 
     def ladder_detect_flight(self):
-        self.circle_path_publish(self.waypoint_contest[1][0], self.waypoint_contest[1][1], self.waypoint_contest[1][2], 0.25, 8.5) ## 8.5m 반지름으로 원주비행, 0.07 rad/s 천천히 회전 (but 기준은 없다..)
+        self.circle_path_publish(self.waypoint_contest[1][0], self.waypoint_contest[1][1], self.waypoint_contest[1][2], 0.07, 8.5) ## 8.5m 반지름으로 원주비행, 0.07 rad/s 천천히 회전 (but 기준은 없다..)
         #if( (self.offboard_setpoint_counter % 3 ==0) and (self.offboard_setpoint_counter % 5 == 0)):
         self.ladder_detect_on()
         if(self.theta-self.initial_theta > math.pi * 2): ## 회전 이후
@@ -894,6 +841,7 @@ class OffboardControl(Node):
             self.is_go_to_center = 0
             self.is_ladder_detected = 1
             self.initial_theta = -1
+            self.is_yaw_arranged = 0
             if(self.real_ladder_list[0][0]==0 and self.real_ladder_list[0][1]==0):
                 self.get_logger().info(f" ladder detected failed. use emergency ladder location ")
                 self.real_ladder_list = self.emergency_ladder_location
@@ -921,63 +869,209 @@ class OffboardControl(Node):
         self.is_departed = 0
         self.mission_check()
 
-    def timer_callback(self) -> None:
-        if(self.offboard_setpoint_counter % 20 == 0 and self.offboard_setpoint_counter>21):
-            (self.f).write('['+str(self.vehicle_odom.x)+", "+str(self.vehicle_odom.y)+", "+str(self.vehicle_odom.z)+'],'+"\n")
-        
-        #self.get_logger().info(f"local position {[self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]}")
-        """Callback function for the timer."""
-        x = float(self.waypoint_list[self.waypoint_count][0])
-        y = float(self.waypoint_list[self.waypoint_count][1])
-        z = float(self.waypoint_list[self.waypoint_count][2])
-        v = float(self.waypoint_velocity[self.waypoint_count])
-        yaw = float(self.waypoint_yaw[self.waypoint_count])
-        
-        if self.offboard_setpoint_counter == 10: ## 처음, 토픽 10까지 발행 후 이륙
-            self.engage_offboard_mode()
-            self.arm()
-            self.make_points_for_contest(self.waypoint_contest[0], self.waypoint_contest[1], self.waypoint_contest[2]) ## 시작 시 받은 wpt 3점을 코드에서 쓸 wpt 리스트에 넣음
-            self.f = open('/home/kimseheon/flight_log_dataset/flight_log.txt', 'w')
-            self.previous_yaw = self.now_yaw
-        if(self.waypoint_count == 2 and self.is_mission_ladder_finished == 0): ## ?? mw1에 도착해서 wpt 2로 가야 할 때 & wpt_count가 2일 때 (wpt 2로 갈 때) & ladder mission이 안 끝났을 때
-            if(self.stayed_finished == 0):
-                self.stay_in_moment(self.waypoint_list[self.waypoint_count-1][0], self.waypoint_list[self.waypoint_count-1][1], self.waypoint_list[self.waypoint_count-1][2], self.waypoint_velocity[self.waypoint_count-1], 0)
+
+    def hovering(self,  t_x:float, t_y:float, t_z:float, t_v:float, t_yaw:float): ## 주어진 목표점에서 hovering
+        self.get_logger().info(f" enter hovering def ")
+        self.get_logger().info(f"To x:{t_x}, y:{t_y}, z:{t_z}, v:{t_v}, yaw:{t_yaw} ")
+        msg = TrajectorySetpoint()
+        self.publish_offboard_control_heartbeat_signal(True)
+
+        msg.x = float(t_x)
+        msg.y = float(t_y)
+        msg.z = float(t_z)
+        msg.yaw = float(t_yaw)
+
+        self.previous_waypoint[0] = self.vehicle_odom.x
+        self.previous_waypoint[1] = self.vehicle_odom.y
+        self.previous_waypoint[2] = self.vehicle_odom.z
+        self.stable_counter += 1
+
+        self.stable_odom[0] += self.vehicle_odom.x
+        self.stable_odom[1] += self.vehicle_odom.y
+        self.stable_odom[2] += self.vehicle_odom.z
+
+        if(self.stable_counter % 3 == 0):
+            self.previous_waypoint[0] = self.stable_odom[0]/3
+            self.previous_waypoint[1] = self.stable_odom[1]/3
+            self.previous_waypoint[2] = self.stable_odom[2]/3
+            self.stable_odom = [0, 0, 0]
+
+        msg.timestamp = int(self.get_clock().now().nanoseconds/1000)
+        self.trajectory_setpoint_publisher.publish(msg)
+
+        self.get_logger().info(f" vehible_dom.z = {self.vehicle_odom.z} ")
+
+
+        if (t_z - 0.1) < self.previous_waypoint[2] < (t_z + 0.1) : ## 목표점에 도달하면 (+-0.1m 이내일 때 도달로 인정)
+             self.end_p += 1 ## end_p 증가
+        self.get_logger().info(f" end_p = {self.end_p} ")
+
+    def waeng_waeng_ei(self,  t_x:float, t_y:float, t_z:float, t_v:float, t_yaw:float): ## 원하는 고도 z로 이륙 후 x, y, z로 이동, 되돌아와서 착륙
+        msg = TrajectorySetpoint()
+        self.publish_offboard_control_heartbeat_signal(True)
+        self.get_logger().info(f" vehicle_odom.z = {self.vehicle_odom.z} ")
+
+## heading 정렬을 위한 기존 점 정의
+        x = self.previous_waypoint[0]
+        y = self.previous_waypoint[1]
+        z = self.previous_waypoint[2]
+
+## 이렇게 해야 할까 싶기도 . . # ~.~ goto_waypoint 함수에서 주기적으로 바꿔줘서 안해도 괜찮을 듯? goto_waypoint를 믿어보자..
+        # x = self.vehicle_odom.x
+        # y = self.vehicle_odom.y
+        # z = self.vehicle_odom.z
+
+        msg.x = float(t_x)
+        msg.y = float(t_y)
+        msg.z = float(t_z)
+        self.get_logger().info(f" w_count = {self.w_count} ")
+        msg.timestamp = int(self.get_clock().now().nanoseconds/1000)
+        #self.trajectory_setpoint_publisher.publish(msg) # ~.~ 교수님께서 자동비행 실험할때도 goto_waypoint로 해보라고 하셔가지고 위치 기반으로 보내는 거 일단 주석처리 해놨어~ 그리고 뒤에도 goto_waypoint 함수 써놨길래!  
+        ''''
+        diff_x = t_x - x
+        diff_y = t_y - y
+
+        msg.yaw = math.atan2(diff_y,diff_x)
+        t_yaw = msg.yaw
+        ''' # ~.~ 사실 goto waypoint 에서 yaw값 헤딩하는 건 구현되어 있어서 별도로 안해줘도 됨~
+        if self.w_count == 0: ## (0,0,z)로 이륙
+            self.goto_waypoint(0, 0, t_z, t_v, 0)
+            self.get_logger().info(f" To (0, 0, {t_z}) at {t_v}m/s")
+            if self.is_departed == 1:
+                self.w_count = 1
+                self.is_departed = 0
+        elif self.w_count == 1: ## circle path
+            self.circle_path_publish(0, 0, t_z, 0.1, 3)
+            self.get_logger().info(f" ({t_x}, {t_y}, {t_z}) circle path with radius 3.5m")
+            if (self.theta-self.initial_theta) > 2*math.pi:
+                self.w_count = 2
+                self.is_yaw_arranged = 0
+                self.is_go_to_center = 0
+                self.initial_theta = -1
+        elif self.w_count == 2: 
+            self.goto_waypoint(self.vehicle_odom.x, self.vehicle_odom.y, t_z, 0, 0)
+            if(self.is_departed==1):
+                self.w_count = 3
+                self.is_departed = 0
+        elif self.w_count == 3: ## (0, 0, z)로 이동
+            self.goto_waypoint(0, 0, t_z, t_v, 1)
+            self.get_logger().info(f" To (0, 0, {t_z}) at {t_v}m/s")
+            if self.is_departed ==1:
+                self.w_count = 4
+                self.is_departed = 0 
+        elif self.w_count == 4: ## (0, 0, 0)로 이동 / 착륙 시 속도 고정 (0.5m/s) # ~.~ 여기 주석처리 해놨던데 살리는게 나은 것 같..음. 콜백말고 여기다 넣는게 더 깔끔하지 않아? 콜백 하나에 명령 하나 원칙도 지키기 쉽고 
+            if ((-0.1) < self.vehicle_odom.z < (0.1) ):
+                self.end_p += 1
+                if(self.end_p>100):   ## ~.~ disarm 바로하니까 튕기는 이슈가 발생해서 너가 호버링 할때 했듯이 end_p로 좀 랜딩 기다렸다가 disarm 시켰어
+                    self.get_logger().info(f" disarm ")
+                    self.disarm()                         
+                else :
+                    self.get_logger().info(f" land ")
+                    self.land()
+            elif (- 0.5) < self.vehicle_odom.z < (0.5): ## 착륙 시(이걸 다르게 알 방법이 없나??) 
+                self.get_logger().info(f" land ")
+                self.land() ## 착륙해라
+            else :
+                self.goto_waypoint(0, 0, 0, 0.5, 0)
             
-            elif(self.is_ladder_detected == 0): ##사다리 탐지가 안 되면
-                self.ladder_detect_flight() ## 사다리 탐지 비행 (r8.5 원주비행)
-                if(self.is_ladder_detected == 1):
-                    self.stayed_finished = 0
+            
+            '''
+             self.goto_waypoint(0, 0, 0, 0.5, 0)
+             self.get_logger().info(f" To (0, 0, 0) at 0.5 m/s")
+             if (self.is_departed == 1):
+                 if ((- 0.1) < self.vehicle_odom.z < (0.1)): ## 착륙
+                     self.get_logger().info(f" land ")
+                     self.land()
+            '''     
+
+ ##TODO : 목표점 도달 시 몇 초간 유지?/ 처음 시작할 때 그대로 안 뜨는 이유가 뭘까/ 이동하면서 odom 보정? / heading 바꿀 때 회전이 너무 빠른가?
+ ##       land > disarm 문제가 있다.. 
+ # ~.~ 처음 시작할때 그대로 안 뜨는 이유 : waypoint를 이동하면서 previous_yaw가 이전 yaw값을 저장하고 그 previous_yaw값을 publish 하는게 yaw값 안바꾸게 하는 기본 원리거든? 
+ # ~.~ 근데 아예 처음 시작할때는 previous_yaw가 0으로 설정되어있기 때문에 0도 각도로 회전함! 이게 이유였고
+ # ~.~ 근데 이륙할때 회전하면서 이륙하는 거는 아무리 생각해도 너무 불안정할 것 같아 바꿔놨어~
+ # ~.~ heading 바꿀때 회전이 너무 빠른거 교수님이 좀 전에 시뮬레이션 보면서 지적했던 문제인데 미리 발견했었군.. 할일이 늘었습니다. heading 천천히 바꾸래요 ㅠㅠ 
+ # ~.~ 그리고 timer_callback 한번 돌때는 publish 명령이 한번만 가게 하는게 좋을 것 같아 
+ # ~.~ land > disarm 문제는 주석처리단 여러가지를 바꿨더니 해결되긴 했는데 뭐가 문제였는지는 모르겠어    
+    def timer_callback(self) -> None:
+        self.get_logger().info(f" enter timer_callback ")
+        if(self.offboard_setpoint_counter == 0):
+            self.previous_yaw = self.previous_yaw = euler_from_quaternion(self.vehicle_odom.q[0], self.vehicle_odom.q[1], self.vehicle_odom.q[2], self.vehicle_odom.q[3])
+            # ~.~ 요것이 초기 yaw값 받아서 처음 이륙할때 회전 안하게 할 것임
+        
+        
+        if self.offboard_setpoint_counter == 10: ## 처음, 토픽 10까지 발행 후 이륙 
+            # ~.~ 이꺼 원래 self.offboard_setpoint_counter > 10 으로 되어 있었는데, 그러면 10 이상일때 시동걸라는 publish를 계속.. 보내게 될텐데 그러면 안될 것 같아서 분리했어
+            self.engage_offboard_mode()
+            self.arm() ## 이륙
+        self.waeng_waeng_ei(0,0,-3,1, 1)
+
+        #if (self.offboard_setpoint_counter > 10):
+
+
+        '''
+        if self.w_count == 3: ##착륙
+            if (-0.2) < self.vehicle_odom.z < (0.2):
+                self.get_logger().info(f" disarm ")
+                self.disarm()
+                # ~.~ disarm이랑 land 분리하는게 낫지 않을까? land는 명령이고 disarm은 아예 시동꺼버리는 거라 land로 착륙하고 나면 disarm 하는게 맞지 않을까 싶어 드론이 착륙하라는건지 시동끄라는건지 헷갈리지 않을까 
+                # 물론 시동끄면 착륙하겠지만~ 우리 드론은 그걸 알만큼 똑똑한 것 같지는 않아서.. ㅎㅎ 
+            if (- 0.5) < self.vehicle_odom.z < (0.5): ## 착륙 시(이걸 다르게 알 방법이 없나??) 
+                # ~.~ 괜찮은 것 같습니다~ 근데 land()함수가 알아서 안정적으로 착륙하게 하는 것 같아서 50cm로 넉넉하게 범위를 잡으면 좋을 것 같아서 바꿨어. 직접 실험해봐야 할 것 같기도 하고?
+                # ~.~ warigari 함수에 모두 통일해놨어! callback하나에 하나의 명령만 가는게 좋을 것 같아서 일단 이렇게 바꿨는데 다른 의견 환영입니다. 수고하셨습니다~ 
+                self.get_logger().info(f" land ")
+                self.land() ## 착륙해라
+
+
             else:
-                self.mission_ladder() ## SE 알고리즘 짜고 wpt 2로 가자~
-        
-        elif(self.waypoint_count == 3 and self.is_mission_ladder_finished == 0): ## (go) MPoint2로 갈 때, se 점들을 다 통과하지 못했을 때, wpt2 도달 후 이제 mp2로 간다~
-            self.mission_ladder()
+                self.get_logger().info(f" goto_waypoint(0, 0, 0) ")
+                self.goto_waypoint(0, 0, 0, 0.5, 0)
+                self.get_logger().info(f" vehicle_odom.z = {self.vehicle_odom.z} ")
+        '''
 
-        elif(self.waypoint_count == 7 and self.is_mission_ladder_finished == 0): ## (back) wpt2로 갈 때, 사다리 미션 못 했을 때 : 사다리 미션 수행 ; mp2에서 wpt2로 간다~
-            self.mission_ladder()
-        
-        elif(self.waypoint_count == 8 and self.is_mission_ladder_finished == 0): ## (back) mp1로 갈 때, 사다리 미션 못 했을 때? : wpt2에서 mp1 로 간다~ 
-            self.mission_ladder()
-
-        elif(self.is_mission_delivery == 1): ## wpt3을 지남 & 배달 아직 안 함
-            self.mission_delivery()
-            self.is_departed = 0
-        
-        else:
-            self.goto_waypoint(x, y, z, v, yaw) ## 미션 상황이 아닐 때; (x, y, z)로 감
-       
-        if(self.is_departed == 1 and (self.waypoint_count < self.waypoint_num)): # next waypoint update ## wpt에 도달했고 다음 wpt가 존재
-            self.waypoint_update()
-            if(self.waypoint_count == self.waypoint_num):
-                (self.f).close()
 
         self.offboard_setpoint_counter += 1
-
-        #print("crossbow 확정 위치")
-        #print(self.crossbow_location_confirmed)
-        #print("crossbow 임시 위치")
-        #print(self.crossbow_location)
         
+        # self.get_logger().info(f"local position {[self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z]}")
+        # """Callback function for the timer."""
+        # x = float(0)
+        # y = float(0)
+        # z = float(-5)
+        # v = float(0)
+        # yaw = float(0)
+
+        #    self.make_points_for_contest(self.waypoint_contest[0], self.waypoint_contest[1], self.waypoint_contest[2]) ## 시작 시 받은 wpt 3점을 코드에서 쓸 wpt 리스트에 넣음
+        
+        # if(self.waypoint_count == 2 and self.is_mission_ladder_finished == 0): ## ?? mw1에 도착해서 wpt 2로 가야 할 때 & wpt_count가 2일 때 (wpt 2로 갈 때) & ladder mission이 안 끝났을 때
+        #     if(self.stayed_finished == 0):
+        #         self.stay_in_moment(self.waypoint_list[self.waypoint_count-1][0], self.waypoint_list[self.waypoint_count-1][1], self.waypoint_list[self.waypoint_count-1][2], self.waypoint_velocity[self.waypoint_count-1], 0)
+            
+        #     elif(self.is_ladder_detected == 0): ##사다리 탐지가 안 되면
+        #         self.ladder_detect_flight() ## 사다리 탐지 비행 (r8.5 원주비행)
+        #         if(self.is_ladder_detected == 1):
+        #             self.stayed_finished = 0
+        #     else:
+        #         self.mission_ladder() ## SE 알고리즘 짜고 wpt 2로 가자~
+        
+        # elif(self.waypoint_count == 3 and self.is_mission_ladder_finished == 0): ## (go) MPoint2로 갈 때, se 점들을 다 통과하지 못했을 때, wpt2 도달 후 이제 mp2로 간다~
+        #     self.mission_ladder()
+
+        # elif(self.waypoint_count == 7 and self.is_mission_ladder_finished == 0): ## (back) wpt2로 갈 때, 사다리 미션 못 했을 때 : 사다리 미션 수행 ; mp2에서 wpt2로 간다~
+        #     self.mission_ladder()
+        
+        # elif(self.waypoint_count == 8 and self.is_mission_ladder_finished == 0): ## (back) mp1로 갈 때, 사다리 미션 못 했을 때? : wpt2에서 mp1 로 간다~ 
+        #     self.mission_ladder()
+
+        # elif(self.is_mission_delivery == 1): ## wpt3을 지남 & 배달 아직 안 함
+        #     self.mission_delivery()
+        #     self.is_departed = 0
+        
+        # else:
+        #     self.goto_waypoint(x, y, z, v, yaw) ## 미션 상황이 아닐 때; (x, y, z)로 감
+       
+        # if(self.is_departed == 1 and (self.waypoint_count < self.waypoint_num)): # next waypoint update ## wpt에 도달했고 다음 wpt가 존재
+        #     self.waypoint_update()
+        
+        # self.offboard_setpoint_counter += 1
        
 
        

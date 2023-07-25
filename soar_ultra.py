@@ -987,7 +987,6 @@ class OffboardControl(Node):
             self.get_logger().info(f" vx, vy, vz, yaw oper : {msg.vx, msg.vy, msg.vz, msg.yaw} \n")
 
     def move_any_direction(self, direction, v, publish_num):
-        self.publish_offboard_control_heartbeat_signal(False)
         msg = TrajectorySetpoint()
         self.deacc_num = 10
         self.any_direction_time +=1
@@ -1014,8 +1013,8 @@ class OffboardControl(Node):
             msg.vz = float(0)
             msg.vx = float(0)
             msg.vy = float(0)    
-        msg.x = math.nan
-        msg.y = math.nan
+        msg.x = self.vehicle_odom.x
+        msg.y = self.vehicle_odom.y
         msg.z = math.nan
 
         yaw_flag = 0
@@ -1029,6 +1028,7 @@ class OffboardControl(Node):
         if(yaw_flag == 0):
             t_yaw = math.atan2(msg.vy, msg.vx)
             if(t_yaw-self.now_yaw>=4*plus_yaw and t_yaw-self.now_yaw<pi):
+                self.publish_offboard_control_heartbeat_signal(True)
                 self.any_direction_time -= 1
                 if(self.change_yaw==-1):
                     self.change_yaw = self.now_yaw
@@ -1037,6 +1037,7 @@ class OffboardControl(Node):
                 msg.vz = float(0)
                 self.change_yaw = plus_radian(self.change_yaw, plus_yaw) 
             elif(t_yaw-self.now_yaw>=pi and t_yaw-self.now_yaw<=2*pi-4*plus_yaw):
+                self.publish_offboard_control_heartbeat_signal(True)
                 self.any_direction_time -= 1
                 if(self.change_yaw == -1):
                     self.change_yaw = self.now_yaw
@@ -1045,6 +1046,7 @@ class OffboardControl(Node):
                 msg.vz = float(0)
                 self.change_yaw = plus_radian(self.change_yaw, -plus_yaw)
             elif(self.now_yaw-t_yaw>4*plus_yaw and self.now_yaw-t_yaw<=pi):
+                self.publish_offboard_control_heartbeat_signal(True)
                 self.any_direction_time -= 1
                 if(self.change_yaw == -1):
                     self.change_yaw = self.now_yaw
@@ -1053,6 +1055,7 @@ class OffboardControl(Node):
                 msg.vz = float(0)
                 self.change_yaw = plus_radian(self.change_yaw, -plus_yaw)
             elif(self.now_yaw-t_yaw>pi and self.now_yaw-t_yaw<=2*pi-4*plus_yaw):
+                self.publish_offboard_control_heartbeat_signal(True)
                 self.any_direction_time -= 1
                 if(self.change_yaw == -1):
                     self.change_yaw = self.now_yaw
@@ -1062,6 +1065,10 @@ class OffboardControl(Node):
                 self.change_yaw = plus_radian(self.change_yaw, plus_yaw)
             else:
                 self.change_yaw = t_yaw
+                self.publish_offboard_control_heartbeat_signal(False)
+                msg.x = math.nan
+                msg.y = math.nan
+                msg.z = math.nan
                 
             msg.yaw = float(self.change_yaw) 
         

@@ -161,7 +161,6 @@ class OffboardControl(Node):
         self.ground_initial_num = 0
         self.initial_theta3 = -10
         self.wait_time = 0
-        self.any_direction_time = 0
     
         self.is_new_go = 0 ## 다음 wpt가 존재하는지
         self.is_departed = 0 ## wpt에 도달했는지 
@@ -874,7 +873,7 @@ class OffboardControl(Node):
         self.publish_offboard_control_heartbeat_signal(False)
         msg = TrajectorySetpoint()
         self.deacc_num = 10
-        self.one_direction_time +=1
+        self.one_direction_time += 1
         if(self.one_direction_time == publish_num):
             self.is_departed = 1
             return
@@ -913,17 +912,18 @@ class OffboardControl(Node):
             msg.vx = float(0)
             msg.vy = float(0)
             msg.vz = float(0)
-        if(self.vehicle_odom.z < self.real_ground_z-3 and direction != '-z'):
-            if(self.vehicle_odom.z <= self.real_ground_z-4):
-                msg.vz = 0.5*abs(self.real_ground_z-4-self.vehicle_odom.z)
+
+        if(self.vehicle_odom.z < self.real_ground_z-2 and direction != '-z'): ## 하강?
+            if(self.vehicle_odom.z <= self.real_ground_z-3):
+                msg.vz = 0.5*abs(self.real_ground_z-3-self.vehicle_odom.z)
             else :
-                msg.vz = -0.5*abs(self.real_ground_z-4-self.vehicle_odom.z)
+                msg.vz = -0.5*abs(self.real_ground_z-3-self.vehicle_odom.z)
         
-        elif(self.vehicle_odom.x > self.real_ground_x+10 or self.vehicle_odom.x < self.real_ground_x-10):
+        elif(self.vehicle_odom.x > self.real_ground_x+7 or self.vehicle_odom.x < self.real_ground_x-7):
             msg.vz = float(0)
             msg.vx = float(0)
             msg.vy = float(0)
-        elif(self.vehicle_odom.y > self.real_ground_y+10 or self.vehicle_odom.y < self.real_ground_y-10):
+        elif(self.vehicle_odom.y > self.real_ground_y+7 or self.vehicle_odom.y < self.real_ground_y-7):
             msg.vz = float(0)
             msg.vx = float(0)
             msg.vy = float(0)
@@ -937,31 +937,28 @@ class OffboardControl(Node):
         yaw_flag = 0
         if(msg.vx == 0 and msg.vy == 0):
             msg.yaw = math.nan
-            yaw_flag=1
+            yaw_flag = 1
         else :
             msg.yaw = float(math.atan2(msg.vy, msg.vx))
         plus_yaw = 0.07
         pi = math.pi
         if(yaw_flag == 0):
             t_yaw = math.atan2(msg.vy, msg.vx)
-            if(t_yaw-self.now_yaw>=4*plus_yaw and t_yaw-self.now_yaw<pi):
-                self.one_direction_time -= 1
-                if(self.change_yaw==-1):
+            if(t_yaw - self.now_yaw >= 4 * plus_yaw and t_yaw-self.now_yaw < pi):
+                if(self.change_yaw == -1):
                     self.change_yaw = self.now_yaw
                 msg.vx = float(0)
                 msg.vy = float(0)
                 msg.vz = float(0)
                 self.change_yaw = plus_radian(self.change_yaw, plus_yaw) 
-            elif(t_yaw-self.now_yaw>=pi and t_yaw-self.now_yaw<=2*pi-4*plus_yaw):
+            elif(t_yaw-self.now_yaw >= pi and t_yaw-self.now_yaw <= 2*pi - 4 * plus_yaw):
                 if(self.change_yaw == -1):
                     self.change_yaw = self.now_yaw
-                self.one_direction_time -= 1
                 msg.vx = float(0)
                 msg.vy = float(0)
                 msg.vz = float(0)
                 self.change_yaw = plus_radian(self.change_yaw, -plus_yaw)
-            elif(self.now_yaw-t_yaw>4*plus_yaw and self.now_yaw-t_yaw<=pi):
-                self.one_direction_time -= 1
+            elif(self.now_yaw - t_yaw > 4 * plus_yaw and self.now_yaw - t_yaw <= pi):
                 if(self.change_yaw == -1):
                     self.change_yaw = self.now_yaw
                 msg.vx = float(0)
@@ -969,7 +966,6 @@ class OffboardControl(Node):
                 msg.vz = float(0)
                 self.change_yaw = plus_radian(self.change_yaw, -plus_yaw)
             elif(self.now_yaw-t_yaw>pi and self.now_yaw-t_yaw<=2*pi-4*plus_yaw):
-                self.one_direction_time -= 1
                 if(self.change_yaw == -1):
                     self.change_yaw = self.now_yaw
                 msg.vx = float(0)
@@ -985,91 +981,6 @@ class OffboardControl(Node):
         self.trajectory_setpoint_publisher.publish(msg)
         if(self.offboard_setpoint_counter %5 ==0):
             self.get_logger().info(f" vx, vy, vz, yaw oper : {msg.vx, msg.vy, msg.vz, msg.yaw} \n")
-
-    def move_any_direction(self, direction, v, publish_num):
-        self.publish_offboard_control_heartbeat_signal(False)
-        msg = TrajectorySetpoint()
-        self.deacc_num = 10
-        self.any_direction_time +=1
-        if(self.any_direction_time == publish_num):
-            self.is_departed = 1
-            return
-        if(publish_num - self.one_direction_time < self.deacc_num):
-            v = v * (publish_num-self.one_direction_time)/self.deacc_num
-        direction = direction*math.pi/180
-        msg.vx = v * math.cos(direction)
-        msg.vy = v * math.sin(direction)
-
-        if(self.vehicle_odom.z < self.real_ground_z-3 and direction != '-z'):
-            if(self.vehicle_odom.z <= self.real_ground_z-4):
-                msg.vz = 0.5*abs(self.real_ground_z-4-self.vehicle_odom.z)
-            else :
-                msg.vz = -0.5*abs(self.real_ground_z-4-self.vehicle_odom.z)
-        
-        elif(self.vehicle_odom.x > self.real_ground_x+10 or self.vehicle_odom.x < self.real_ground_x-10):
-            msg.vz = float(0)
-            msg.vx = float(0)
-            msg.vy = float(0)
-        elif(self.vehicle_odom.y > self.real_ground_y+10 or self.vehicle_odom.y < self.real_ground_y-10):
-            msg.vz = float(0)
-            msg.vx = float(0)
-            msg.vy = float(0)    
-        msg.x = math.nan
-        msg.y = math.nan
-        msg.z = math.nan
-
-        yaw_flag = 0
-        if(msg.vx == 0 and msg.vy == 0):
-            msg.yaw = math.nan
-            yaw_flag=1
-        else :
-            msg.yaw = float(math.atan2(msg.vy, msg.vx))
-        plus_yaw = 0.07
-        pi = math.pi
-        if(yaw_flag == 0):
-            t_yaw = math.atan2(msg.vy, msg.vx)
-            if(t_yaw-self.now_yaw>=4*plus_yaw and t_yaw-self.now_yaw<pi):
-                self.any_direction_time -= 1
-                if(self.change_yaw==-1):
-                    self.change_yaw = self.now_yaw
-                msg.vx = float(0)
-                msg.vy = float(0)
-                msg.vz = float(0)
-                self.change_yaw = plus_radian(self.change_yaw, plus_yaw) 
-            elif(t_yaw-self.now_yaw>=pi and t_yaw-self.now_yaw<=2*pi-4*plus_yaw):
-                self.any_direction_time -= 1
-                if(self.change_yaw == -1):
-                    self.change_yaw = self.now_yaw
-                msg.vx = float(0)
-                msg.vy = float(0)
-                msg.vz = float(0)
-                self.change_yaw = plus_radian(self.change_yaw, -plus_yaw)
-            elif(self.now_yaw-t_yaw>4*plus_yaw and self.now_yaw-t_yaw<=pi):
-                self.any_direction_time -= 1
-                if(self.change_yaw == -1):
-                    self.change_yaw = self.now_yaw
-                msg.vx = float(0)
-                msg.vy = float(0)
-                msg.vz = float(0)
-                self.change_yaw = plus_radian(self.change_yaw, -plus_yaw)
-            elif(self.now_yaw-t_yaw>pi and self.now_yaw-t_yaw<=2*pi-4*plus_yaw):
-                self.any_direction_time -= 1
-                if(self.change_yaw == -1):
-                    self.change_yaw = self.now_yaw
-                msg.vx = float(0)
-                msg.vy = float(0)
-                msg.vz = float(0)
-                self.change_yaw = plus_radian(self.change_yaw, plus_yaw)
-            else:
-                self.change_yaw = t_yaw
-                
-            msg.yaw = float(self.change_yaw) 
-        
-        msg.timestamp = int(self.get_clock().now().nanoseconds/1000)
-        self.trajectory_setpoint_publisher.publish(msg)
-        if(self.offboard_setpoint_counter %5 ==0):
-            self.get_logger().info(f" vx, vy, vz, yaw oper : {msg.vx, msg.vy, msg.vz, msg.yaw} \n")
-
 
     
     def circle_by_vel(self):
@@ -1082,11 +993,11 @@ class OffboardControl(Node):
         msg.x = math.nan
         msg.y = math.nan
         msg.z = math.nan
-        if(self.vehicle_odom.z < self.real_ground_z-3):
-            if(self.vehicle_odom.z <= self.real_ground_z-4):
-                msg.vz = 0.5*abs(self.real_ground_z-4-self.vehicle_odom.z)
+        if(self.vehicle_odom.z < self.real_ground_z-2):
+            if(self.vehicle_odom.z <= self.real_ground_z-3):
+                msg.vz = 0.5*abs(self.real_ground_z-3-self.vehicle_odom.z)
             else :
-                msg.vz = -0.5*abs(self.real_ground_z-4-self.vehicle_odom.z)
+                msg.vz = -0.5*abs(self.real_ground_z-3-self.vehicle_odom.z)
         msg.vz = float(0)
         radius = 4
         msg.vx = 0.6* float(np.cos(self.theta))
@@ -1101,43 +1012,50 @@ class OffboardControl(Node):
         #self.publish_offboard_control_heartbeat_signal(True)
 
         if self.w_count == 0: ## (0,0,z)로 이륙
-            self.move_only_one_direction('z', 0.7, 200)
+            self.move_only_one_direction('z', 0.5, 200)
             if self.is_departed == 1:
                 self.w_count = 1
                 self.is_departed = 0
                 self.one_direction_time = 0
                 self.change_yaw = -1
-        elif self.w_count == 1: ## (x, y, z)로 이동
-            self.move_any_direction(0, 0.7, 80)
-            if self.is_departed == 1:
-                self.w_count = 2
-                self.is_departed = 0
-                self.any_direction_time = 0
-                self.change_yaw = -1
-        elif self.w_count == 2: 
+        elif self.w_count == 1: 
             self.circle_by_vel()
             if (self.theta-self.initial_theta3) > math.pi*2:
-                self.w_count = 3
+                self.w_count = 2
                 self.inital_theat3 = -10
                 self.is_departed = 0
                 self.one_direction_time = 0
                 self.change_yaw = -1
+        elif self.w_count == 2: ## (x, y, z)로 이동
+            self.move_only_one_direction('x', 0.5, 70)
+            if self.is_departed == 1:
+                self.w_count = 3
+                self.is_departed = 0
+                self.one_direction_time = 0
+                self.change_yaw = -1
         elif self.w_count == 3: ## (x, y, z)로 이동
-            self.move_any_direction(180, 0.7, 80)
+            self.move_only_one_direction('y', 0.5, 70)
             if self.is_departed == 1:
                 self.w_count = 4
                 self.is_departed = 0
-                self.any_direction_time = 0
+                self.one_direction_time = 0
                 self.change_yaw = -1
         elif self.w_count == 4: ## (x, y, z)로 이동
-            self.move_only_one_direction('n', 0.7, 20)
+            self.move_only_one_direction('-x', 0.5, 70)
             if self.is_departed == 1:
                 self.w_count = 5
                 self.is_departed = 0
                 self.one_direction_time = 0
                 self.change_yaw = -1
+        elif self.w_count == 5: ## (x, y, z)로 이동
+            self.move_only_one_direction('-y', 0.5, 70)
+            if self.is_departed == 1:
+                self.w_count =6
+                self.is_departed = 0
+                self.one_direction_time = 0
+                self.change_yaw = -1
         
-        elif self.w_count == 5: ## (0, 0, 0)로 이동 / 착륙 시 속도 고정 (0.5m/s) # ~.~ 여기 주석처리 해놨던데 살리는게 나은 것 같..음. 콜백말고 여기다 넣는게 더 깔끔하지 않아? 콜백 하나에 명령 하나 원칙도 지키기 쉽고 
+        elif self.w_count == 6: ## (0, 0, 0)로 이동 / 착륙 시 속도 고정 (0.5m/s) # ~.~ 여기 주석처리 해놨던데 살리는게 나은 것 같..음. 콜백말고 여기다 넣는게 더 깔끔하지 않아? 콜백 하나에 명령 하나 원칙도 지키기 쉽고 
             if ((-0.3+self.real_ground_z) < self.vehicle_odom.z < (0.3+self.real_ground_z) ):
                 self.end_p += 1
                 if(self.end_p>100):   ## ~.~ disarm 바로하니까 튕기는 이슈가 발생해서 너가 호버링 할때 했듯이 end_p로 좀 랜딩 기다렸다가 disarm 시켰어
@@ -1176,7 +1094,7 @@ class OffboardControl(Node):
         
         if self.offboard_setpoint_counter == 10: ## 처음, 토픽 10까지 발행 후 이륙 
             # ~.~ 이꺼 원래 self.offboard_setpoint_counter > 10 으로 되어 있었는데, 그러면 10 이상일때 시동걸라는 publish를 계속.. 보내게 될텐데 그러면 안될 것 같아서 분리했어
-            self.real_ground_x = self.ground_x/self.ground_initial_num
+            self.real_ground_x = self.ground_x/self.ground_initial_num ### 처음 시작 x 값 (위치)
             self.real_ground_y = self.ground_y/self.ground_initial_num
             self.real_ground_z = self.ground_z/self.ground_initial_num
             self.real_ground_yaw = self.ground_yaw/self.ground_initial_num

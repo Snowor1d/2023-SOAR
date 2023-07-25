@@ -1078,7 +1078,7 @@ class OffboardControl(Node):
             self.initial_theta3 = (self.now_yaw-math.pi/2)
             self.theta = self.initial_theta3
         msg = TrajectorySetpoint()
-        w = 0.2
+        w = 0.17
         msg.x = math.nan
         msg.y = math.nan
         msg.z = math.nan
@@ -1089,8 +1089,8 @@ class OffboardControl(Node):
                 msg.vz = -0.5*abs(self.real_ground_z-4-self.vehicle_odom.z)
         msg.vz = float(0)
         radius = 4
-        msg.vx = 0.6* float(np.cos(self.theta))
-        msg.vy = 0.6* float(np.sin(self.theta))
+        msg.vx = 0.65* float(np.cos(self.theta))
+        msg.vy = 0.65* float(np.sin(self.theta))
         msg.yaw = (math.atan2(msg.vy, msg.vx)+math.pi/2) # (90 degree)
         self.theta = self.theta + w * self.dt
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
@@ -1101,43 +1101,21 @@ class OffboardControl(Node):
         #self.publish_offboard_control_heartbeat_signal(True)
 
         if self.w_count == 0: ## (0,0,z)로 이륙
-            self.move_only_one_direction('z', 0.7, 200)
+            self.move_only_one_direction('z', 0.5, 200)
             if self.is_departed == 1:
                 self.w_count = 1
                 self.is_departed = 0
                 self.one_direction_time = 0
                 self.change_yaw = -1
         elif self.w_count == 1: ## (x, y, z)로 이동
-            self.move_any_direction(0, 0.7, 80)
-            if self.is_departed == 1:
-                self.w_count = 2
-                self.is_departed = 0
-                self.any_direction_time = 0
-                self.change_yaw = -1
-        elif self.w_count == 2: 
             self.circle_by_vel()
             if (self.theta-self.initial_theta3) > math.pi*2:
-                self.w_count = 3
+                self.w_count = 2
                 self.inital_theat3 = -10
                 self.is_departed = 0
                 self.one_direction_time = 0
                 self.change_yaw = -1
-        elif self.w_count == 3: ## (x, y, z)로 이동
-            self.move_any_direction(180, 0.7, 80)
-            if self.is_departed == 1:
-                self.w_count = 4
-                self.is_departed = 0
-                self.any_direction_time = 0
-                self.change_yaw = -1
-        elif self.w_count == 4: ## (x, y, z)로 이동
-            self.move_only_one_direction('n', 0.7, 20)
-            if self.is_departed == 1:
-                self.w_count = 5
-                self.is_departed = 0
-                self.one_direction_time = 0
-                self.change_yaw = -1
-        
-        elif self.w_count == 5: ## (0, 0, 0)로 이동 / 착륙 시 속도 고정 (0.5m/s) # ~.~ 여기 주석처리 해놨던데 살리는게 나은 것 같..음. 콜백말고 여기다 넣는게 더 깔끔하지 않아? 콜백 하나에 명령 하나 원칙도 지키기 쉽고 
+        elif self.w_count == 2: ## (0, 0, 0)로 이동 / 착륙 시 속도 고정 (0.5m/s) # ~.~ 여기 주석처리 해놨던데 살리는게 나은 것 같..음. 콜백말고 여기다 넣는게 더 깔끔하지 않아? 콜백 하나에 명령 하나 원칙도 지키기 쉽고 
             if ((-0.3+self.real_ground_z) < self.vehicle_odom.z < (0.3+self.real_ground_z) ):
                 self.end_p += 1
                 if(self.end_p>100):   ## ~.~ disarm 바로하니까 튕기는 이슈가 발생해서 너가 호버링 할때 했듯이 end_p로 좀 랜딩 기다렸다가 disarm 시켰어

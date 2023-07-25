@@ -870,6 +870,11 @@ class OffboardControl(Node):
     def print_odom(self):
         self.get_logger().info(f" odom x y z yaw : {self.vehicle_odom.x, self.vehicle_odom.y, self.vehicle_odom.z, euler_from_quaternion(self.vehicle_odom.q[0], self.vehicle_odom.q[1], self.vehicle_odom.q[2], self.vehicle_odom.q[3])} ")
 
+    def start_delivery(self):
+        
+    def finish_delivery(self):
+
+    
     def move_only_one_direction(self, direction, v, publish_num):
         self.publish_offboard_control_heartbeat_signal(False)
         msg = TrajectorySetpoint()

@@ -12,6 +12,8 @@ In, 'map_talker.py', it publish obstacle informations using voxelization and clu
 
 All of this have to be operated in px4_autopilot development environment.
 
+
+
 HAVE A NICE DAY :)
 
 

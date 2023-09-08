@@ -15,16 +15,18 @@ All of this have to be operated in px4_autopilot development environment.
 ![simulation1](https://github.com/Snowor1d/2023-SOAR/assets/96639889/62bdef5d-88eb-415e-bd6a-5b113b87bd0f)
 simulation image
 
+
 ![go path](https://github.com/Snowor1d/2023-SOAR/assets/96639889/7f017e69-e03b-48d6-aa9f-dd5147faac3e)
 path in gazebo world
 
-![Screenshot from 2023-07-12 00-08-00](https://github.com/Snowor1d/2023-SOAR/assets/96639889/61de2ec6-2eb9-4ee5-ba0a-e2e85ead2954)
 
-![soar_structure2](https://github.com/Snowor1d/2023-SOAR/assets/96639889/7b6f3e14-43f2-406e-952a-5cc1ea28f0c2)
+![soar_simulation_software_structure](https://github.com/Snowor1d/2023-SOAR/assets/96639889/602c798c-1476-46c0-958a-3a57c90b8c43)
 simulation software structure 
 
+
 ![Screenshot from 2023-07-17 21-50-29](https://github.com/Snowor1d/2023-SOAR/assets/96639889/99d6ec07-7067-414c-92b3-2c524dbcd7f7)
-run simulations with nodes
+run simulation with nodes
+
 
 HAVE A NICE DAY :)
 
